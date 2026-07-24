@@ -1,13 +1,13 @@
 {
   "type": "raiv-wire-active-project",
   "version": 1,
-  "savedAt": "2026-07-24T20:35:20.115Z",
+  "savedAt": "2026-07-24T20:49:12.494Z",
   "project": {
     "version": 1,
     "id": "proj_mrz5jajb_2",
     "name": "Demo Build",
     "createdAt": "2026-07-24T16:25:47.543Z",
-    "updatedAt": "2026-07-24T20:35:20.113Z",
+    "updatedAt": "2026-07-24T20:49:12.479Z",
     "nodes": [
       {
         "id": "node_mrz5jajb_3",
@@ -154,8 +154,8 @@
         "tag": "JB1",
         "name": "Field junction",
         "description": "",
-        "x": 360,
-        "y": 160,
+        "x": 277,
+        "y": 3,
         "width": 130,
         "height": 100,
         "terminals": [
@@ -657,9 +657,9 @@
       }
     ],
     "view": {
-      "x": -7.591397849462366,
-      "y": 61.10291858678952,
-      "scale": 0.9489247311827957
+      "x": -7.362428726688508,
+      "y": 144.68125595584993,
+      "scale": 0.9203035908360635
     },
     "meta": {
       "drawingNumber": "WD-DEMO-001",
