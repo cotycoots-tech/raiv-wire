@@ -86,8 +86,12 @@
           <div class="catalog-toolbar">
             <input type="search" id="catalog-search" placeholder="Search catalog…" />
             <div class="catalog-toolbar-btns">
-              <button type="button" id="btn-catalog-export" class="btn-tiny" title="Export catalog JSON">Export</button>
-              <button type="button" id="btn-catalog-import" class="btn-tiny" title="Import catalog JSON">Import</button>
+              <button type="button" id="btn-catalog-export-excel" class="btn-tiny" title="Export Excel .xlsx (Devices + Terminals sheets)">Excel</button>
+              <button type="button" id="btn-catalog-export-csv" class="btn-tiny" title="Export CSV (opens in Excel, works offline)">CSV</button>
+              <button type="button" id="btn-catalog-export-json" class="btn-tiny" title="Export JSON">JSON</button>
+            </div>
+            <div class="catalog-toolbar-btns">
+              <button type="button" id="btn-catalog-import" class="btn-tiny" title="Import Excel, CSV, or JSON">Import</button>
               <button type="button" id="btn-catalog-reset" class="btn-tiny" title="Restore starter catalog">Reset</button>
             </div>
           </div>
@@ -241,7 +245,7 @@
   </div>
 
   <input type="file" id="file-import" accept="application/json,.json" hidden />
-  <input type="file" id="file-catalog-import" accept="application/json,.json" hidden />
+  <input type="file" id="file-catalog-import" accept=".xlsx,.xls,.csv,.json,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" hidden />
 
   <!-- Modal: save to device catalog -->
   <div id="catalog-modal" class="modal hidden" role="dialog" aria-modal="true">

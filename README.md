@@ -18,7 +18,7 @@ python3 -m http.server 8080
 
 | Area | What you get |
 |------|----------------|
-| **Device catalog** | Reusable inventory (mfr, P/N, terminals). Place, save from Properties, import/export JSON |
+| **Device catalog** | Reusable inventory (mfr, P/N, terminals). Place, save from Properties; import/export **Excel (.xlsx)**, CSV, or JSON |
 | **Devices (generic)** | Blank templates: PLC, VFD, motor, sensor, HMI, pushbutton, contactor, PSU |
 | **Enclosures** | Junction box, control panel, pull box |
 | **Terminals** | Terminal strip, DIN rail terminals |

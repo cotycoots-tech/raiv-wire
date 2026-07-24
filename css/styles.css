@@ -388,7 +388,12 @@ button {
 
 .catalog-toolbar-btns {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
+}
+
+.catalog-toolbar-btns .btn-tiny {
+  min-width: 0;
 }
 
 .btn-tiny {

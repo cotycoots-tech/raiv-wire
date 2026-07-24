@@ -44,6 +44,9 @@ import {
   createNodeFromCatalogItem,
   exportCatalogJson,
   importCatalogJson,
+  exportCatalogExcel,
+  exportCatalogCsv,
+  importCatalogFile,
   resetCatalogToDefaults,
   INVENTORY_GROUPS,
 } from "./catalog.js";
@@ -553,34 +556,85 @@ function bindCatalogUi() {
     renderCatalogPalette();
   });
 
-  $("#btn-catalog-export")?.addEventListener("click", () => {
-    const blob = new Blob([exportCatalogJson()], { type: "application/json" });
+  const downloadBlob = (blob, filename) => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "raiv-wire-device-catalog.json";
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(a.href);
-    setStatus("Catalog exported");
+  };
+
+  $("#btn-catalog-export-excel")?.addEventListener("click", async () => {
+    try {
+      setStatus("Building Excel catalog…");
+      const blob = await exportCatalogExcel();
+      downloadBlob(blob, "raiv-wire-device-catalog.xlsx");
+      setStatus("Catalog exported as Excel (.xlsx)");
+    } catch (err) {
+      // Offline fallback: CSV opens in Excel
+      console.warn(err);
+      const csv = exportCatalogCsv();
+      downloadBlob(
+        new Blob([csv], { type: "text/csv;charset=utf-8" }),
+        "raiv-wire-device-catalog.csv"
+      );
+      setStatus("Excel library unavailable — exported CSV (opens in Excel)");
+      alert(
+        "Could not build .xlsx (needs network once for the Excel library).\n\nA CSV file was downloaded instead — Excel can open and save it.\n\n" +
+          (err.message || "")
+      );
+    }
+  });
+
+  $("#btn-catalog-export-json")?.addEventListener("click", () => {
+    downloadBlob(
+      new Blob([exportCatalogJson()], { type: "application/json" }),
+      "raiv-wire-device-catalog.json"
+    );
+    setStatus("Catalog exported as JSON");
+  });
+
+  $("#btn-catalog-export-csv")?.addEventListener("click", () => {
+    downloadBlob(
+      new Blob([exportCatalogCsv()], { type: "text/csv;charset=utf-8" }),
+      "raiv-wire-device-catalog.csv"
+    );
+    setStatus("Catalog exported as CSV (Excel)");
+  });
+
+  // legacy single Export button if present
+  $("#btn-catalog-export")?.addEventListener("click", async () => {
+    $("#btn-catalog-export-excel")?.click();
   });
 
   $("#btn-catalog-import")?.addEventListener("click", () => {
     $("#file-catalog-import")?.click();
   });
 
-  $("#file-catalog-import")?.addEventListener("change", () => {
+  $("#file-catalog-import")?.addEventListener("change", async () => {
     const f = $("#file-catalog-import")?.files?.[0];
     if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        importCatalogJson(reader.result, "merge");
-        renderCatalogPalette();
-        setStatus("Catalog imported (merged)");
-      } catch (err) {
-        alert("Catalog import failed: " + err.message);
-      }
-    };
-    reader.readAsText(f);
+    const modeAns = prompt(
+      `Import "${f.name}" into device catalog.\n\nType:\n  merge   — update matching items, add new\n  replace — replace entire catalog with this file\n\nLeave blank or cancel to abort.`,
+      "merge"
+    );
+    if (modeAns === null || !String(modeAns).trim()) {
+      $("#file-catalog-import").value = "";
+      setStatus("Import cancelled");
+      return;
+    }
+    const mode = String(modeAns).trim().toLowerCase().startsWith("r")
+      ? "replace"
+      : "merge";
+    try {
+      setStatus(`Importing catalog (${f.name})…`);
+      await importCatalogFile(f, mode);
+      renderCatalogPalette();
+      setStatus(`Catalog imported from ${f.name} (${mode})`);
+    } catch (err) {
+      alert("Catalog import failed: " + err.message);
+      setStatus("Catalog import failed");
+    }
     $("#file-catalog-import").value = "";
   });
 

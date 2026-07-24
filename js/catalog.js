@@ -226,6 +226,67 @@ export function defaultCatalogItems() {
       ],
     },
     {
+      id: "seed_fuji_pb_mom_led_24v",
+      catalogName: "Fuji Electric PB 24V LED Momentary",
+      inventoryGroup: "operator",
+      baseType: "pushbutton",
+      tagPrefix: "PB",
+      name: "Fuji PB momentary LED",
+      manufacturer: "Fuji Electric",
+      partNumber: "AR22F0L-10E3S",
+      description: "22 mm momentary pushbutton with 24 V DC LED illumination (NO contact + lamp)",
+      width: 80,
+      height: 75,
+      terminals: [
+        { id: "NO1", name: "NO 3" },
+        { id: "NO2", name: "NO 4" },
+        { id: "NC1", name: "NC 1 (opt)" },
+        { id: "NC2", name: "NC 2 (opt)" },
+        { id: "LED+", name: "LED +24V X1" },
+        { id: "LED-", name: "LED 0V X2" },
+      ],
+    },
+    {
+      id: "seed_fuji_pb_mom_led_24v_flush",
+      catalogName: "Fuji Electric PB flush 24V LED Mom",
+      inventoryGroup: "operator",
+      baseType: "pushbutton",
+      tagPrefix: "PB",
+      name: "Fuji flush PB mom LED",
+      manufacturer: "Fuji Electric",
+      partNumber: "AR22F0R-10E3S",
+      description: "22 mm flush momentary pushbutton, 24 V DC LED, NO contact block",
+      width: 80,
+      height: 75,
+      terminals: [
+        { id: "NO1", name: "NO 3" },
+        { id: "NO2", name: "NO 4" },
+        { id: "LED+", name: "LED +24V X1" },
+        { id: "LED-", name: "LED 0V X2" },
+      ],
+    },
+    {
+      id: "seed_fuji_pb_mom_led_24v_ext",
+      catalogName: "Fuji Electric PB extended 24V LED Mom",
+      inventoryGroup: "operator",
+      baseType: "pushbutton",
+      tagPrefix: "PB",
+      name: "Fuji extended PB mom LED",
+      manufacturer: "Fuji Electric",
+      partNumber: "AR22E0L-10E3S",
+      description: "22 mm extended-head momentary pushbutton, 24 V DC LED",
+      width: 80,
+      height: 75,
+      terminals: [
+        { id: "NO1", name: "NO 3" },
+        { id: "NO2", name: "NO 4" },
+        { id: "NC1", name: "NC 1 (opt)" },
+        { id: "NC2", name: "NC 2 (opt)" },
+        { id: "LED+", name: "LED +24V X1" },
+        { id: "LED-", name: "LED 0V X2" },
+      ],
+    },
+    {
       id: "seed_k_contactor",
       catalogName: "IEC contactor 9A",
       inventoryGroup: "power",
@@ -308,6 +369,7 @@ export function loadCatalog() {
       const data = JSON.parse(raw);
       if (Array.isArray(data.items) && data.items.length) {
         _items = data.items;
+        ensureSeedItems();
         return _items;
       }
     }
@@ -317,6 +379,19 @@ export function loadCatalog() {
   _items = defaultCatalogItems();
   saveCatalog();
   return _items;
+}
+
+/** Add any new built-in seed items missing from an existing catalog (by id). */
+function ensureSeedItems() {
+  if (!_items) return;
+  let changed = false;
+  for (const seed of defaultCatalogItems()) {
+    if (!_items.some((i) => i.id === seed.id)) {
+      _items.push(deepClone(seed));
+      changed = true;
+    }
+  }
+  if (changed) saveCatalog();
 }
 
 export function getCatalogItems() {
@@ -457,6 +532,12 @@ export function importCatalogJson(text, mode = "merge") {
   const data = JSON.parse(text);
   const incoming = data.items || data;
   if (!Array.isArray(incoming)) throw new Error("Invalid catalog file");
+  return mergeCatalogItems(incoming, mode);
+}
+
+/** Merge or replace catalog with normalized raw items */
+export function mergeCatalogItems(incoming, mode = "merge") {
+  if (!Array.isArray(incoming)) throw new Error("Invalid catalog items");
   if (mode === "replace") {
     replaceCatalog(incoming.map(normalizeItem));
   } else {
@@ -466,7 +547,10 @@ export function importCatalogJson(text, mode = "merge") {
       const existing = _items.find(
         (i) =>
           i.id === item.id ||
-          (i.partNumber && item.partNumber && i.partNumber === item.partNumber && i.catalogName === item.catalogName)
+          (i.partNumber &&
+            item.partNumber &&
+            i.partNumber === item.partNumber &&
+            i.catalogName === item.catalogName)
       );
       if (existing) {
         Object.assign(existing, item, { id: existing.id });
@@ -481,6 +565,24 @@ export function importCatalogJson(text, mode = "merge") {
 }
 
 function normalizeItem(raw) {
+  let terminals = raw.terminals;
+  if (typeof terminals === "string" && terminals.trim()) {
+    try {
+      terminals = JSON.parse(terminals);
+    } catch {
+      // "1:BN +V | 2:WH | 3:BU 0V" style
+      terminals = terminals.split("|").map((part, i) => {
+        const p = part.trim();
+        const m = p.match(/^([^:]+):\s*(.*)$/);
+        if (m) return { id: m[1].trim(), name: m[2].trim() || m[1].trim() };
+        return { id: String(i + 1), name: p };
+      });
+    }
+  }
+  if (!Array.isArray(terminals) || !terminals.length) {
+    terminals = [{ id: "1", name: "1" }];
+  }
+
   return {
     id: raw.id || uid("cat"),
     catalogName: raw.catalogName || raw.name || "Catalog item",
@@ -491,15 +593,400 @@ function normalizeItem(raw) {
     manufacturer: raw.manufacturer || "",
     partNumber: raw.partNumber || "",
     description: raw.description || "",
-    width: raw.width || 100,
-    height: raw.height || 80,
-    terminals: deepClone(raw.terminals || [{ id: "1", name: "1" }]),
+    width: Number(raw.width) || 100,
+    height: Number(raw.height) || 80,
+    terminals: deepClone(terminals),
     mateCoding: raw.mateCoding || "",
-    matePins: raw.matePins || 0,
+    matePins: Number(raw.matePins) || 0,
     mateFace: raw.mateFace || "",
-    category: raw.category || findCatalogEntry(raw.baseType || raw.type)?.category || "device",
+    category:
+      raw.category ||
+      findCatalogEntry(raw.baseType || raw.type)?.category ||
+      "device",
     createdAt: raw.createdAt || new Date().toISOString(),
   };
+}
+
+// ── Excel / CSV spreadsheet I/O ──
+
+const DEVICE_HEADERS = [
+  "id",
+  "catalogName",
+  "inventoryGroup",
+  "baseType",
+  "tagPrefix",
+  "name",
+  "manufacturer",
+  "partNumber",
+  "description",
+  "width",
+  "height",
+  "category",
+  "mateCoding",
+  "matePins",
+  "mateFace",
+  "terminals",
+  "createdAt",
+];
+
+const TERMINAL_HEADERS = [
+  "catalogId",
+  "catalogName",
+  "termId",
+  "termName",
+  "matePin",
+  "side",
+  "sortOrder",
+];
+
+/** SheetJS loaded on demand from CDN (for .xlsx) */
+let _XLSX = null;
+const SHEETJS_CDN = "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs";
+
+export async function loadSheetJS() {
+  if (_XLSX) return _XLSX;
+  try {
+    _XLSX = await import(SHEETJS_CDN);
+    return _XLSX;
+  } catch (err) {
+    throw new Error(
+      "Could not load Excel library (network required for .xlsx). Use CSV export/import offline, or check connectivity. " +
+        (err.message || "")
+    );
+  }
+}
+
+function itemsToDeviceRows(items) {
+  return items.map((item) => ({
+    id: item.id || "",
+    catalogName: item.catalogName || "",
+    inventoryGroup: item.inventoryGroup || "other",
+    baseType: item.baseType || "",
+    tagPrefix: item.tagPrefix || "",
+    name: item.name || "",
+    manufacturer: item.manufacturer || "",
+    partNumber: item.partNumber || "",
+    description: item.description || "",
+    width: item.width ?? "",
+    height: item.height ?? "",
+    category: item.category || "",
+    mateCoding: item.mateCoding || "",
+    matePins: item.matePins ?? "",
+    mateFace: item.mateFace || "",
+    terminals: JSON.stringify(item.terminals || []),
+    createdAt: item.createdAt || "",
+  }));
+}
+
+function itemsToTerminalRows(items) {
+  const rows = [];
+  for (const item of items) {
+    (item.terminals || []).forEach((t, i) => {
+      rows.push({
+        catalogId: item.id || "",
+        catalogName: item.catalogName || "",
+        termId: t.id || "",
+        termName: t.name || "",
+        matePin: t.matePin || "",
+        side: t.side || "",
+        sortOrder: i + 1,
+      });
+    });
+  }
+  return rows;
+}
+
+function rowsToItems(deviceRows, terminalRows = []) {
+  const termsById = new Map();
+  for (const tr of terminalRows) {
+    const cid = String(tr.catalogId || "").trim();
+    if (!cid) continue;
+    if (!termsById.has(cid)) termsById.set(cid, []);
+    termsById.get(cid).push({
+      id: String(tr.termId || "").trim() || "1",
+      name: String(tr.termName || tr.termId || "").trim() || "1",
+      matePin: String(tr.matePin || "").trim(),
+      side: String(tr.side || "").trim(),
+      _sort: Number(tr.sortOrder) || 0,
+    });
+  }
+  for (const [, list] of termsById) {
+    list.sort((a, b) => a._sort - b._sort);
+    list.forEach((t) => delete t._sort);
+  }
+
+  return deviceRows
+    .filter((r) => r.catalogName || r.name || r.partNumber)
+    .map((r) => {
+      const id = String(r.id || "").trim();
+      let terminals = termsById.get(id);
+      if (!terminals?.length && r.terminals) {
+        // from JSON column
+        const raw = { ...r, terminals: r.terminals };
+        return normalizeItem(raw);
+      }
+      return normalizeItem({
+        ...r,
+        terminals: terminals?.length
+          ? terminals.map(({ id: tid, name, matePin, side }) => ({
+              id: tid,
+              name,
+              ...(matePin ? { matePin } : {}),
+              ...(side ? { side } : {}),
+            }))
+          : r.terminals,
+      });
+    });
+}
+
+/**
+ * Export catalog as Excel .xlsx (Devices + Terminals sheets).
+ * Returns a Blob. Requires network once to load SheetJS.
+ */
+export async function exportCatalogExcel() {
+  const XLSX = await loadSheetJS();
+  const items = getCatalogItems();
+  const wb = XLSX.utils.book_new();
+
+  const deviceRows = itemsToDeviceRows(items);
+  const wsDevices = XLSX.utils.json_to_sheet(deviceRows, { header: DEVICE_HEADERS });
+  wsDevices["!cols"] = DEVICE_HEADERS.map((h) => ({
+    wch: h === "terminals" || h === "description" ? 40 : h === "catalogName" ? 28 : 14,
+  }));
+  XLSX.utils.book_append_sheet(wb, wsDevices, "Devices");
+
+  const termRows = itemsToTerminalRows(items);
+  const wsTerms = XLSX.utils.json_to_sheet(
+    termRows.length ? termRows : [{ catalogId: "", catalogName: "", termId: "", termName: "", matePin: "", side: "", sortOrder: "" }],
+    { header: TERMINAL_HEADERS }
+  );
+  wsTerms["!cols"] = TERMINAL_HEADERS.map(() => ({ wch: 16 }));
+  XLSX.utils.book_append_sheet(wb, wsTerms, "Terminals");
+
+  // Readme sheet
+  const help = [
+    { Field: "How to use", Value: "Edit Devices and/or Terminals, then Import in RAIV Wire (merge or replace)." },
+    { Field: "inventoryGroup", Value: "plc | drives | sensors | operator | power | safety | io | other" },
+    { Field: "baseType", Value: "plc | vfd | motor | sensor | hmi | pushbutton | contactor | psu | …" },
+    { Field: "terminals (Devices)", Value: 'JSON array e.g. [{"id":"1","name":"BN +V"}] — or use Terminals sheet' },
+    { Field: "Terminals sheet", Value: "One row per landing; catalogId must match Devices.id" },
+    { Field: "Export date", Value: new Date().toISOString() },
+  ];
+  const wsHelp = XLSX.utils.json_to_sheet(help);
+  wsHelp["!cols"] = [{ wch: 22 }, { wch: 70 }];
+  XLSX.utils.book_append_sheet(wb, wsHelp, "Readme");
+
+  const out = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  return new Blob([out], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
+
+/**
+ * Export catalog as CSV (Excel-compatible). Works fully offline.
+ */
+export function exportCatalogCsv() {
+  const items = getCatalogItems();
+  const rows = itemsToDeviceRows(items);
+  const lines = [DEVICE_HEADERS.join(",")];
+  for (const row of rows) {
+    lines.push(
+      DEVICE_HEADERS.map((h) => csvEscape(row[h] ?? "")).join(",")
+    );
+  }
+  // BOM for Excel UTF-8
+  return "\uFEFF" + lines.join("\r\n");
+}
+
+function csvEscape(val) {
+  const s = String(val ?? "");
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+/**
+ * Import catalog from Excel .xlsx / .xls ArrayBuffer.
+ */
+export async function importCatalogExcel(arrayBuffer, mode = "merge") {
+  const XLSX = await loadSheetJS();
+  const wb = XLSX.read(arrayBuffer, { type: "array" });
+
+  const deviceSheetName =
+    wb.SheetNames.find((n) => /^devices?$/i.test(n)) ||
+    wb.SheetNames.find((n) => !/^terminals?$/i.test(n) && !/^readme$/i.test(n)) ||
+    wb.SheetNames[0];
+  const termSheetName = wb.SheetNames.find((n) => /^terminals?$/i.test(n));
+
+  if (!deviceSheetName) throw new Error("No worksheet found in Excel file");
+
+  const deviceRows = XLSX.utils.sheet_to_json(wb.Sheets[deviceSheetName], {
+    defval: "",
+    raw: false,
+  });
+  const terminalRows = termSheetName
+    ? XLSX.utils.sheet_to_json(wb.Sheets[termSheetName], { defval: "", raw: false })
+    : [];
+
+  if (!deviceRows.length) throw new Error("Devices sheet is empty");
+
+  // Normalize header aliases (Catalog Name → catalogName)
+  const normRows = deviceRows.map(normalizeSpreadsheetRow);
+  const normTerms = terminalRows.map(normalizeSpreadsheetRow);
+
+  return mergeCatalogItems(rowsToItems(normRows, normTerms), mode);
+}
+
+/**
+ * Import catalog from CSV text (Devices-style columns).
+ */
+export function importCatalogCsv(text, mode = "merge") {
+  const rows = parseCsv(text);
+  if (!rows.length) throw new Error("CSV is empty");
+  const normRows = rows.map(normalizeSpreadsheetRow);
+  return mergeCatalogItems(rowsToItems(normRows, []), mode);
+}
+
+function normalizeSpreadsheetRow(row) {
+  const out = {};
+  for (const [k, v] of Object.entries(row)) {
+    const key = String(k)
+      .trim()
+      .replace(/^\uFEFF/, "")
+      .replace(/\s+/g, "")
+      .replace(/_/g, "");
+    // map common labels
+    const map = {
+      id: "id",
+      catalogname: "catalogName",
+      catalog: "catalogName",
+      inventorygroup: "inventoryGroup",
+      group: "inventoryGroup",
+      basetype: "baseType",
+      type: "baseType",
+      tagprefix: "tagPrefix",
+      prefix: "tagPrefix",
+      name: "name",
+      manufacturer: "manufacturer",
+      mfr: "manufacturer",
+      partnumber: "partNumber",
+      partno: "partNumber",
+      pn: "partNumber",
+      description: "description",
+      notes: "description",
+      width: "width",
+      height: "height",
+      category: "category",
+      matecoding: "mateCoding",
+      matepins: "matePins",
+      mateface: "mateFace",
+      terminals: "terminals",
+      createdat: "createdAt",
+      catalogid: "catalogId",
+      termid: "termId",
+      termname: "termName",
+      matepin: "matePin",
+      side: "side",
+      sortorder: "sortOrder",
+    };
+    const canon = map[key.toLowerCase()] || key;
+    out[canon] = v;
+  }
+  return out;
+}
+
+/** Minimal CSV parser supporting quotes */
+function parseCsv(text) {
+  const cleaned = String(text || "").replace(/^\uFEFF/, "");
+  const lines = [];
+  let i = 0;
+  let field = "";
+  let row = [];
+  let inQuotes = false;
+  while (i < cleaned.length) {
+    const c = cleaned[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (cleaned[i + 1] === '"') {
+          field += '"';
+          i += 2;
+          continue;
+        }
+        inQuotes = false;
+        i++;
+        continue;
+      }
+      field += c;
+      i++;
+      continue;
+    }
+    if (c === '"') {
+      inQuotes = true;
+      i++;
+      continue;
+    }
+    if (c === ",") {
+      row.push(field);
+      field = "";
+      i++;
+      continue;
+    }
+    if (c === "\n" || c === "\r") {
+      if (c === "\r" && cleaned[i + 1] === "\n") i++;
+      row.push(field);
+      field = "";
+      if (row.some((cell) => String(cell).trim() !== "")) lines.push(row);
+      row = [];
+      i++;
+      continue;
+    }
+    field += c;
+    i++;
+  }
+  row.push(field);
+  if (row.some((cell) => String(cell).trim() !== "")) lines.push(row);
+
+  if (!lines.length) return [];
+  const headers = lines[0].map((h) => String(h).trim());
+  return lines.slice(1).map((cells) => {
+    const obj = {};
+    headers.forEach((h, idx) => {
+      obj[h] = cells[idx] ?? "";
+    });
+    return obj;
+  });
+}
+
+/**
+ * Auto-detect format and import catalog file contents.
+ * @param {File} file
+ * @param {"merge"|"replace"} mode
+ */
+export async function importCatalogFile(file, mode = "merge") {
+  const name = (file.name || "").toLowerCase();
+  if (name.endsWith(".json")) {
+    const text = await file.text();
+    return importCatalogJson(text, mode);
+  }
+  if (name.endsWith(".csv") || name.endsWith(".txt")) {
+    const text = await file.text();
+    return importCatalogCsv(text, mode);
+  }
+  if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+    const buf = await file.arrayBuffer();
+    return importCatalogExcel(buf, mode);
+  }
+  // sniff
+  const buf = await file.arrayBuffer();
+  const head = new Uint8Array(buf.slice(0, 4));
+  // PK.. zip / xlsx
+  if (head[0] === 0x50 && head[1] === 0x4b) {
+    return importCatalogExcel(buf, mode);
+  }
+  const text = new TextDecoder().decode(buf);
+  if (text.trim().startsWith("{") || text.trim().startsWith("[")) {
+    return importCatalogJson(text, mode);
+  }
+  return importCatalogCsv(text, mode);
 }
 
 /**
