@@ -1,13 +1,13 @@
 {
   "type": "raiv-wire-active-project",
   "version": 1,
-  "savedAt": "2026-07-24T19:56:21.000Z",
+  "savedAt": "2026-07-24T20:25:59.883Z",
   "project": {
     "version": 1,
     "id": "proj_mrz5jajb_2",
     "name": "Demo Build",
     "createdAt": "2026-07-24T16:25:47.543Z",
-    "updatedAt": "2026-07-24T16:32:30.286Z",
+    "updatedAt": "2026-07-24T20:25:59.882Z",
     "nodes": [
       {
         "id": "node_mrz5jajb_3",
@@ -311,7 +311,7 @@
           },
           {
             "id": "TS-",
-            "name": "Therm \u2212",
+            "name": "Therm −",
             "matePin": "",
             "side": ""
           }
