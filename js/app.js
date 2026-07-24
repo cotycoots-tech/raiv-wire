@@ -3312,7 +3312,14 @@ function bindUI() {
   $("#btn-delete-project")?.addEventListener("click", deleteCurrentProject);
   $("#btn-export").addEventListener("click", exportJSON);
   $("#btn-export-csv").addEventListener("click", exportCSV);
-  $("#btn-save")?.addEventListener("click", () => saveAll({ fromUser: true }));
+  $("#btn-save")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    setStatus("Save clicked — writing local data…", "busy");
+    saveAll({ fromUser: true }).catch((err) => {
+      setStatus("Save error: " + (err?.message || err), "err");
+      alert("Save error:\n" + (err?.message || err));
+    });
+  });
   $("#btn-github-settings")?.addEventListener("click", openGitHubSettings);
   $("#btn-github-pull")?.addEventListener("click", () => loadFromGitHub({ fromUser: true }));
   $("#btn-recover-catalog")?.addEventListener("click", () => {
