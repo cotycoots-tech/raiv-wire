@@ -69,6 +69,7 @@
           <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save sync">GitHub</button>
           <button type="button" id="btn-save" class="tool primary" title="Save locally and push to GitHub (if connected)">Save</button>
           <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
+          <button type="button" id="btn-wirelist" class="tool" title="Wire & cable list panel (W)" data-tool-panel="wirelist">Wire list</button>
           <button type="button" id="btn-print" class="tool" title="Print / PDF">Print</button>
         </div>
       </div>
@@ -186,38 +187,92 @@
 
       <!-- Right properties -->
       <aside class="props panel">
-        <h2>Properties</h2>
-        <div id="props-empty" class="props-empty">
-          Select a device, junction box, terminal strip, or cable to edit its landings and details.
-        </div>
-        <div id="props-form" class="props-form hidden"></div>
-
-        <div class="props-divider"></div>
-
-        <h2>Wire &amp; cable list</h2>
-        <div class="table-wrap">
-          <table id="wire-table">
-            <thead>
-              <tr>
-                <th>Cable</th>
-                <th>Cond.</th>
-                <th>Color</th>
-                <th>From</th>
-                <th>To</th>
-                <th>AWG</th>
-                <th>Ends</th>
-              </tr>
-            </thead>
-            <tbody id="wire-table-body">
-              <tr class="empty-row"><td colspan="7">No cables yet</td></tr>
-            </tbody>
-          </table>
+        <div class="props-scroll">
+          <h2>Properties</h2>
+          <div id="props-empty" class="props-empty">
+            Select a device, junction box, terminal strip, or cable to edit its landings and details.
+          </div>
+          <div id="props-form" class="props-form hidden"></div>
         </div>
 
-        <div class="bom-actions">
-          <button type="button" id="btn-export-csv" class="btn-secondary">Export wire list CSV</button>
-        </div>
+        <!-- Compact collapsible wire list in sidebar -->
+        <section id="wire-list-section" class="wire-list-section is-collapsed" aria-label="Wire and cable list">
+          <div class="wire-list-section-header">
+            <button type="button" id="btn-wirelist-side-toggle" class="wire-list-side-toggle" aria-expanded="false" title="Show or hide wire list in sidebar">
+              <span class="wire-list-chevron" aria-hidden="true">▸</span>
+              <span>Wire &amp; cable list</span>
+              <span id="wire-list-count" class="wire-list-count">0</span>
+            </button>
+            <div class="wire-list-section-actions">
+              <button type="button" id="btn-wirelist-expand" class="landing-chip" title="Open full wire list panel">Expand</button>
+            </div>
+          </div>
+          <div class="wire-list-section-body">
+            <div class="table-wrap table-wrap-side">
+              <table id="wire-table" class="wire-table">
+                <thead>
+                  <tr>
+                    <th>Cable</th>
+                    <th>Cond.</th>
+                    <th>Color</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>AWG</th>
+                    <th>Ends</th>
+                  </tr>
+                </thead>
+                <tbody id="wire-table-body">
+                  <tr class="empty-row"><td colspan="7">No cables yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bom-actions">
+              <button type="button" id="btn-export-csv" class="btn-secondary">Export wire list CSV</button>
+            </div>
+          </div>
+        </section>
       </aside>
+    </div>
+
+    <!-- Full wire list drawer (expandable) -->
+    <div id="wire-list-drawer" class="wire-list-drawer is-closed" aria-hidden="true" role="dialog" aria-labelledby="wire-list-drawer-title">
+      <div class="wire-list-drawer-backdrop" id="wire-list-drawer-backdrop"></div>
+      <div class="wire-list-drawer-panel">
+        <div class="wire-list-drawer-resize" id="wire-list-drawer-resize" title="Drag to resize" role="separator" aria-orientation="horizontal"></div>
+        <header class="wire-list-drawer-header">
+          <div class="wire-list-drawer-title-row">
+            <h2 id="wire-list-drawer-title">Wire &amp; cable list</h2>
+            <span id="wire-list-drawer-count" class="wire-list-count">0 cables</span>
+          </div>
+          <div class="wire-list-drawer-actions">
+            <button type="button" id="btn-wirelist-export-csv" class="landing-chip" title="Export CSV">Export CSV</button>
+            <button type="button" id="btn-wirelist-size" class="landing-chip" title="Toggle medium / tall">Size</button>
+            <button type="button" id="btn-wirelist-close" class="landing-chip" title="Close panel (W)">Close</button>
+          </div>
+        </header>
+        <div class="wire-list-drawer-body">
+          <div class="table-wrap table-wrap-drawer">
+            <table id="wire-table-drawer" class="wire-table wire-table-drawer">
+              <thead>
+                <tr>
+                  <th>Cable</th>
+                  <th>Cond.</th>
+                  <th>Color</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>AWG</th>
+                  <th>Ends</th>
+                  <th>Type</th>
+                  <th>Length</th>
+                </tr>
+              </thead>
+              <tbody id="wire-table-drawer-body">
+                <tr class="empty-row"><td colspan="9">No cables yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Print-only wire list (filled before print) -->

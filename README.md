@@ -72,6 +72,7 @@ python3 -m http.server 8080
 | `H` | Pan |
 | `C` | Cable |
 | `L` | Toggle terminal landings panel |
+| `W` | Toggle wire & cable list panel |
 | `Space` (hold) | Temporary pan |
 | `Delete` | Delete selection |
 | `Ctrl/Cmd+S` | Save (local + GitHub if connected) |

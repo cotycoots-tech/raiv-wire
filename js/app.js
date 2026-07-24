@@ -84,6 +84,12 @@ const state = {
   /** focus = selection-driven; all = every device */
   landingsFilter: "focus",
   landingsAutoOpen: true,
+  /** Sidebar wire list compact section open/closed */
+  wireListSideOpen: false,
+  /** Full wire list drawer open */
+  wireListDrawerOpen: false,
+  /** mid | tall */
+  wireListDrawerSize: "mid",
 };
 
 const STORAGE_KEY = "raiv-wire-project-v1"; // legacy single-project key
@@ -106,11 +112,13 @@ const cursorPos = $("#cursor-pos");
 const propsEmpty = $("#props-empty");
 const propsForm = $("#props-form");
 const wireTableBody = $("#wire-table-body");
+const wireTableDrawerBody = $("#wire-table-drawer-body");
 const landingMap = $("#landing-map");
 const landingContext = $("#landing-context");
 const landingBar = $("#landing-bar");
 const landingStats = $("#landing-stats");
 const LANDINGS_PREF_KEY = "raiv-wire-landings-pref-v1";
+const WIRELIST_PREF_KEY = "raiv-wire-wirelist-pref-v1";
 const fileImport = $("#file-import");
 const modal = $("#modal");
 const modalTitle = $("#modal-title");
@@ -1153,29 +1161,204 @@ function bindCableProps(cable) {
   });
 }
 
-// ── Wire table ──
-function renderWireTable() {
+// ── Wire list (sidebar + expandable drawer) ──
+function loadWireListPrefs() {
+  try {
+    const raw = localStorage.getItem(WIRELIST_PREF_KEY);
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    if (typeof p.sideOpen === "boolean") state.wireListSideOpen = p.sideOpen;
+    if (typeof p.drawerOpen === "boolean") state.wireListDrawerOpen = p.drawerOpen;
+    if (p.drawerSize === "mid" || p.drawerSize === "tall") state.wireListDrawerSize = p.drawerSize;
+    if (typeof p.customH === "number" && p.customH > 120) state.wireListCustomH = p.customH;
+  } catch {
+    /* ignore */
+  }
+}
+
+function saveWireListPrefs() {
+  try {
+    localStorage.setItem(
+      WIRELIST_PREF_KEY,
+      JSON.stringify({
+        sideOpen: state.wireListSideOpen,
+        drawerOpen: state.wireListDrawerOpen,
+        drawerSize: state.wireListDrawerSize,
+        customH: state.wireListCustomH || null,
+      })
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+function applyWireListUi() {
+  const section = $("#wire-list-section");
+  const drawer = $("#wire-list-drawer");
+  const panel = drawer?.querySelector(".wire-list-drawer-panel");
+
+  section?.classList.toggle("is-open", !!state.wireListSideOpen);
+  section?.classList.toggle("is-collapsed", !state.wireListSideOpen);
+  $("#btn-wirelist-side-toggle")?.setAttribute(
+    "aria-expanded",
+    state.wireListSideOpen ? "true" : "false"
+  );
+
+  const open = !!state.wireListDrawerOpen;
+  drawer?.classList.toggle("is-open", open);
+  drawer?.classList.toggle("is-closed", !open);
+  drawer?.classList.toggle("is-tall", state.wireListDrawerSize === "tall");
+  drawer?.setAttribute("aria-hidden", open ? "false" : "true");
+  $("#btn-wirelist")?.classList.toggle("wirelist-active", open);
+
+  if (panel) {
+    if (state.wireListCustomH) {
+      panel.style.height = `${state.wireListCustomH}px`;
+    } else {
+      panel.style.height = "";
+    }
+  }
+}
+
+function setWireListSideOpen(open) {
+  state.wireListSideOpen = !!open;
+  applyWireListUi();
+  saveWireListPrefs();
+}
+
+function setWireListDrawerOpen(open) {
+  state.wireListDrawerOpen = !!open;
+  if (open && !state.wireListDrawerSize) state.wireListDrawerSize = "mid";
+  applyWireListUi();
+  saveWireListPrefs();
+  if (open) renderWireTable();
+}
+
+function toggleWireListDrawer() {
+  setWireListDrawerOpen(!state.wireListDrawerOpen);
+}
+
+function cycleWireListDrawerSize() {
+  state.wireListDrawerSize = state.wireListDrawerSize === "tall" ? "mid" : "tall";
+  state.wireListCustomH = null;
+  applyWireListUi();
+  saveWireListPrefs();
+}
+
+function bindWireListUi() {
+  loadWireListPrefs();
+  // Drawer closed on load by default for canvas space (side can restore)
+  state.wireListDrawerOpen = false;
+  applyWireListUi();
+
+  $("#btn-wirelist")?.addEventListener("click", () => {
+    toggleWireListDrawer();
+    setStatus(
+      state.wireListDrawerOpen
+        ? "Wire list panel open"
+        : "Wire list panel closed"
+    );
+  });
+  $("#btn-wirelist-side-toggle")?.addEventListener("click", () => {
+    setWireListSideOpen(!state.wireListSideOpen);
+  });
+  $("#btn-wirelist-expand")?.addEventListener("click", () => {
+    setWireListDrawerOpen(true);
+    setStatus("Wire list expanded");
+  });
+  $("#btn-wirelist-close")?.addEventListener("click", () => setWireListDrawerOpen(false));
+  $("#wire-list-drawer-backdrop")?.addEventListener("click", () => setWireListDrawerOpen(false));
+  $("#btn-wirelist-size")?.addEventListener("click", () => {
+    cycleWireListDrawerSize();
+    setStatus(
+      state.wireListDrawerSize === "tall"
+        ? "Wire list: tall"
+        : "Wire list: medium"
+    );
+  });
+  $("#btn-wirelist-export-csv")?.addEventListener("click", () => exportCSV());
+
+  // Resize drawer
+  const handle = $("#wire-list-drawer-resize");
+  if (handle) {
+    let dragging = false;
+    handle.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      handle.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    handle.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const fromBottom = window.innerHeight - e.clientY;
+      state.wireListCustomH = Math.min(
+        Math.max(fromBottom, 160),
+        Math.floor(window.innerHeight * 0.9)
+      );
+      state.wireListDrawerSize =
+        state.wireListCustomH > window.innerHeight * 0.6 ? "tall" : "mid";
+      applyWireListUi();
+    });
+    const endDrag = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      try {
+        handle.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      saveWireListPrefs();
+    };
+    handle.addEventListener("pointerup", endDrag);
+    handle.addEventListener("pointercancel", endDrag);
+  }
+}
+
+function buildWireTableRows(includeExtra = false) {
   const { cables, nodes } = state.project;
   if (!cables.length) {
-    wireTableBody.innerHTML = `<tr class="empty-row"><td colspan="7">No cables yet</td></tr>`;
-    return;
+    const cols = includeExtra ? 9 : 7;
+    return {
+      count: 0,
+      html: `<tr class="empty-row"><td colspan="${cols}">No cables yet</td></tr>`,
+    };
   }
 
   const rows = [];
+  let rowCount = 0;
   for (const cable of cables) {
     const fromN = nodes.find((n) => n.id === cable.from.nodeId);
     const toN = nodes.find((n) => n.id === cable.to.nodeId);
-    const conds = cable.conductors?.length ? cable.conductors : [{ color: "GY", label: "—", index: 1, fromTerminalId: cable.from.terminalId, toTerminalId: cable.to.terminalId }];
-    const ends =
-      cable.terminated
-        ? `${endLabel(cable.endA)} → ${endLabel(cable.endB)}`
-        : "open";
+    const conds = cable.conductors?.length
+      ? cable.conductors
+      : [
+          {
+            color: "GY",
+            label: "—",
+            index: 1,
+            fromTerminalId: cable.from.terminalId,
+            toTerminalId: cable.to.terminalId,
+          },
+        ];
+    const ends = cable.terminated
+      ? `${endLabel(cable.endA)} → ${endLabel(cable.endB)}`
+      : "open";
 
     conds.forEach((cond, i) => {
+      rowCount++;
       const col = colorById(cond.color);
-      const fromRef = landingRef(fromN, cond.fromTerminalId || cable.from.terminalId);
+      const fromRef = landingRef(
+        fromN,
+        cond.fromTerminalId || cable.from.terminalId
+      );
       const toRef = landingRef(toN, cond.toTerminalId || cable.to.terminalId);
-      const selected = state.selection?.type === "cable" && state.selection.id === cable.id;
+      const selected =
+        state.selection?.type === "cable" && state.selection.id === cable.id;
+      const extra =
+        includeExtra
+          ? `<td>${i === 0 ? escapeHtml(cable.type || "") : ""}</td>
+             <td>${i === 0 ? escapeHtml(cable.length || "") : ""}</td>`
+          : "";
       rows.push(`
         <tr data-cable-id="${cable.id}" class="${selected ? "selected" : ""}">
           <td>${i === 0 ? escapeHtml(cable.cableId) : ""}</td>
@@ -1185,17 +1368,43 @@ function renderWireTable() {
           <td>${escapeHtml(toRef)}</td>
           <td>${i === 0 ? escapeHtml(cable.awg || "") : ""}</td>
           <td>${i === 0 ? `<span class="term-flag${cable.terminated ? " on" : ""}">${escapeHtml(ends)}</span>` : ""}</td>
+          ${extra}
         </tr>
       `);
     });
   }
-  wireTableBody.innerHTML = rows.join("");
-  wireTableBody.querySelectorAll("tr[data-cable-id]").forEach((tr) => {
+  return { count: cables.length, rowCount, html: rows.join("") };
+}
+
+function bindWireTableClicks(tbody) {
+  if (!tbody) return;
+  tbody.querySelectorAll("tr[data-cable-id]").forEach((tr) => {
     tr.addEventListener("click", () => {
       state.selection = { type: "cable", id: tr.dataset.cableId };
       render();
     });
   });
+}
+
+function renderWireTable() {
+  const side = buildWireTableRows(false);
+  const full = buildWireTableRows(true);
+  const n = side.count;
+  const label = n === 1 ? "1 cable" : `${n} cables`;
+
+  if (wireTableBody) {
+    wireTableBody.innerHTML = side.html;
+    bindWireTableClicks(wireTableBody);
+  }
+  if (wireTableDrawerBody) {
+    wireTableDrawerBody.innerHTML = full.html;
+    bindWireTableClicks(wireTableDrawerBody);
+  }
+
+  const countEl = $("#wire-list-count");
+  const drawerCount = $("#wire-list-drawer-count");
+  if (countEl) countEl.textContent = String(n);
+  if (drawerCount) drawerCount.textContent = label;
 }
 
 // ── Terminal landings drawer ──
@@ -2598,7 +2807,17 @@ function onKeyDown(e) {
     toggleLandingsPanel();
     return;
   }
+  if (e.key === "w" || e.key === "W") {
+    if (isTyping()) return;
+    e.preventDefault();
+    toggleWireListDrawer();
+    return;
+  }
   if (e.key === "Escape") {
+    if (state.wireListDrawerOpen) {
+      setWireListDrawerOpen(false);
+      return;
+    }
     state.cableFrom = null;
     state.placeType = null;
     layers.overlay.innerHTML = "";
@@ -2658,6 +2877,7 @@ function bindUI() {
   window.addEventListener("afterprint", restorePrintLayout);
   bindGitHubSettingsModal();
   bindLandingsUi();
+  bindWireListUi();
   updateGitHubBadge();
   $("#btn-import").addEventListener("click", () => fileImport.click());
   fileImport.addEventListener("change", () => {

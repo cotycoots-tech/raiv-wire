@@ -351,7 +351,19 @@ button {
 
 .props {
   border-left: 1px solid var(--border);
-  padding: 14px 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.props-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 12px 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1075,23 +1087,125 @@ button {
   margin: 8px 0;
 }
 
+/* ── Wire list (sidebar collapsible + full drawer) ── */
+.wire-list-section {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, #152033 0%, var(--bg-panel) 40%);
+  display: flex;
+  flex-direction: column;
+  max-height: 48%;
+  min-height: 44px;
+}
+
+.wire-list-section.is-collapsed {
+  max-height: 44px;
+}
+
+.wire-list-section.is-open {
+  max-height: min(48%, 360px);
+}
+
+.wire-list-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+
+.wire-list-side-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 11px;
+  text-align: left;
+}
+
+.wire-list-side-toggle:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.wire-list-chevron {
+  color: var(--accent);
+  font-size: 11px;
+  width: 12px;
+  transition: transform 0.12s ease;
+}
+
+.wire-list-section.is-open .wire-list-chevron {
+  transform: rotate(90deg);
+}
+
+.wire-list-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.wire-list-section-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.wire-list-section-body {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 10px 10px;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.wire-list-section.is-open .wire-list-section-body {
+  display: flex;
+}
+
 .table-wrap {
   flex: 1;
-  min-height: 120px;
-  max-height: 280px;
+  min-height: 80px;
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg);
 }
 
-#wire-table {
+.table-wrap-side {
+  max-height: 220px;
+}
+
+.table-wrap-drawer {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  border-color: var(--border-strong);
+}
+
+.wire-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
 }
 
-#wire-table th {
+.wire-table th {
   position: sticky;
   top: 0;
   background: var(--bg-elevated);
@@ -1105,30 +1219,162 @@ button {
   z-index: 1;
 }
 
-#wire-table td {
+.wire-table td {
   padding: 6px 8px;
   border-bottom: 1px solid rgba(42, 54, 74, 0.6);
   font-family: var(--mono);
   vertical-align: middle;
 }
 
-#wire-table tbody tr {
+.wire-table tbody tr {
   cursor: pointer;
 }
 
-#wire-table tbody tr:hover {
+.wire-table tbody tr:hover {
   background: var(--bg-hover);
 }
 
-#wire-table tbody tr.selected {
+.wire-table tbody tr.selected {
   background: var(--accent-dim);
 }
 
-#wire-table .empty-row td {
+.wire-table .empty-row td {
   text-align: center;
   color: var(--text-dim);
   font-family: var(--font);
   padding: 16px;
+}
+
+.wire-table-drawer {
+  font-size: 12px;
+}
+
+.wire-table-drawer th,
+.wire-table-drawer td {
+  padding: 8px 10px;
+}
+
+/* Full expandable drawer */
+.wire-list-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.wire-list-drawer.is-open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.wire-list-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 8, 16, 0.45);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.wire-list-drawer.is-open .wire-list-drawer-backdrop {
+  opacity: 1;
+}
+
+.wire-list-drawer-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--wirelist-h, min(48vh, 480px));
+  background: linear-gradient(180deg, #152033 0%, var(--bg-panel) 24%);
+  border-top: 1px solid var(--border-strong);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.18s ease;
+  min-height: 160px;
+  max-height: 90vh;
+}
+
+.wire-list-drawer.is-open .wire-list-drawer-panel {
+  transform: translateY(0);
+}
+
+.wire-list-drawer.is-tall {
+  --wirelist-h: min(78vh, 780px);
+}
+
+.wire-list-drawer-resize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  z-index: 2;
+  touch-action: none;
+}
+
+.wire-list-drawer-resize::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 3px;
+  border-radius: 99px;
+  background: var(--border-strong);
+}
+
+.wire-list-drawer-resize:hover::after {
+  background: var(--accent);
+}
+
+.wire-list-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.wire-list-drawer-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wire-list-drawer-title-row h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.wire-list-drawer-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.wire-list-drawer-body {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tool.wirelist-active {
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .color-chip {
@@ -1723,6 +1969,7 @@ button {
   .props,
   .landing-bar,
   .landing-resize-handle,
+  .wire-list-drawer,
   .canvas-footer,
   .modal,
   #cable-preview {
