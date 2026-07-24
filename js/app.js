@@ -79,6 +79,11 @@ const state = {
   catalogFilter: "",
   /** @type {{ activeId: string, projects: Record<string, object> }} */
   library: { activeId: "", projects: {} },
+  /** Terminal landings drawer: collapsed | mid | tall */
+  landingsMode: "collapsed",
+  /** focus = selection-driven; all = every device */
+  landingsFilter: "focus",
+  landingsAutoOpen: true,
 };
 
 const STORAGE_KEY = "raiv-wire-project-v1"; // legacy single-project key
@@ -103,6 +108,9 @@ const propsForm = $("#props-form");
 const wireTableBody = $("#wire-table-body");
 const landingMap = $("#landing-map");
 const landingContext = $("#landing-context");
+const landingBar = $("#landing-bar");
+const landingStats = $("#landing-stats");
+const LANDINGS_PREF_KEY = "raiv-wire-landings-pref-v1";
 const fileImport = $("#file-import");
 const modal = $("#modal");
 const modalTitle = $("#modal-title");
@@ -198,6 +206,7 @@ function render() {
   }
   renderProps();
   renderWireTable();
+  maybeAutoOpenLandings();
   renderLandings();
   projectNameInput.value = state.project.name || "";
   updateZoomLabel();
@@ -1189,6 +1198,185 @@ function renderWireTable() {
   });
 }
 
+// ── Terminal landings drawer ──
+function loadLandingsPrefs() {
+  try {
+    const raw = localStorage.getItem(LANDINGS_PREF_KEY);
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    if (p.mode === "collapsed" || p.mode === "mid" || p.mode === "tall") {
+      state.landingsMode = p.mode;
+    }
+    if (p.filter === "focus" || p.filter === "all") {
+      state.landingsFilter = p.filter;
+    }
+    if (typeof p.autoOpen === "boolean") state.landingsAutoOpen = p.autoOpen;
+    if (typeof p.customH === "number" && p.customH > 80) {
+      state.landingsCustomH = p.customH;
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function saveLandingsPrefs() {
+  try {
+    localStorage.setItem(
+      LANDINGS_PREF_KEY,
+      JSON.stringify({
+        mode: state.landingsMode,
+        filter: state.landingsFilter,
+        autoOpen: state.landingsAutoOpen,
+        customH: state.landingsCustomH || null,
+      })
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+function applyLandingsMode() {
+  const app = $("#app");
+  if (!app || !landingBar) return;
+  app.classList.remove("landings-collapsed", "landings-mid", "landings-tall");
+  landingBar.classList.remove("is-open", "is-collapsed");
+
+  const mode = state.landingsMode || "collapsed";
+  if (mode === "collapsed") {
+    app.classList.add("landings-collapsed");
+    landingBar.classList.add("is-collapsed");
+    app.style.removeProperty("--landing-h");
+  } else if (mode === "tall") {
+    app.classList.add("landings-tall");
+    landingBar.classList.add("is-open");
+    if (state.landingsCustomH) {
+      app.style.setProperty("--landing-h", `${state.landingsCustomH}px`);
+    } else {
+      app.style.removeProperty("--landing-h");
+    }
+  } else {
+    app.classList.add("landings-mid");
+    landingBar.classList.add("is-open");
+    if (state.landingsCustomH && mode === "mid") {
+      app.style.setProperty("--landing-h", `${state.landingsCustomH}px`);
+    } else {
+      app.style.removeProperty("--landing-h");
+    }
+  }
+
+  const open = mode !== "collapsed";
+  $("#btn-landings-toggle")?.setAttribute("aria-expanded", open ? "true" : "false");
+  $("#btn-landings")?.classList.toggle("landings-active", open);
+  $("#btn-landings-focus")?.classList.toggle("active", state.landingsFilter === "focus");
+  $("#btn-landings-all")?.classList.toggle("active", state.landingsFilter === "all");
+}
+
+function setLandingsMode(mode) {
+  state.landingsMode = mode;
+  if (mode === "collapsed") state.landingsCustomH = null;
+  applyLandingsMode();
+  saveLandingsPrefs();
+}
+
+function toggleLandingsPanel() {
+  if (state.landingsMode === "collapsed") setLandingsMode("mid");
+  else setLandingsMode("collapsed");
+}
+
+function cycleLandingsSize() {
+  if (state.landingsMode === "collapsed") setLandingsMode("mid");
+  else if (state.landingsMode === "mid") setLandingsMode("tall");
+  else setLandingsMode("mid");
+}
+
+let _landingsAutoOpenKey = null;
+function maybeAutoOpenLandings() {
+  if (!state.landingsAutoOpen) return;
+  if (state.landingsMode !== "collapsed") return;
+  if (!(state.selection?.type === "node" || state.selection?.type === "cable")) {
+    return;
+  }
+  const key = `${state.selection.type}:${state.selection.id}`;
+  // Only auto-open once per selection change (don't fight user after Collapse)
+  if (key === _landingsAutoOpenKey) return;
+  _landingsAutoOpenKey = key;
+  setLandingsMode("mid");
+}
+
+function bindLandingsUi() {
+  loadLandingsPrefs();
+  applyLandingsMode();
+
+  $("#btn-landings")?.addEventListener("click", () => {
+    toggleLandingsPanel();
+    setStatus(
+      state.landingsMode === "collapsed"
+        ? "Landings panel collapsed"
+        : "Landings panel open — Selection / All filters available"
+    );
+  });
+  $("#btn-landings-toggle")?.addEventListener("click", () => toggleLandingsPanel());
+  $("#btn-landings-collapse")?.addEventListener("click", () => setLandingsMode("collapsed"));
+  $("#btn-landings-size")?.addEventListener("click", () => {
+    cycleLandingsSize();
+    setStatus(
+      state.landingsMode === "tall"
+        ? "Landings panel: tall"
+        : "Landings panel: medium"
+    );
+  });
+  $("#btn-landings-focus")?.addEventListener("click", () => {
+    state.landingsFilter = "focus";
+    saveLandingsPrefs();
+    applyLandingsMode();
+    renderLandings();
+  });
+  $("#btn-landings-all")?.addEventListener("click", () => {
+    state.landingsFilter = "all";
+    saveLandingsPrefs();
+    applyLandingsMode();
+    renderLandings();
+  });
+
+  // Drag resize
+  const handle = $("#landing-resize-handle");
+  if (handle) {
+    let dragging = false;
+    handle.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      dragging = true;
+      landingBar?.classList.add("is-resizing");
+      handle.setPointerCapture(e.pointerId);
+      if (state.landingsMode === "collapsed") setLandingsMode("mid");
+      e.preventDefault();
+    });
+    handle.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const app = $("#app");
+      if (!app) return;
+      const rect = app.getBoundingClientRect();
+      const fromBottom = rect.bottom - e.clientY;
+      const h = Math.min(Math.max(fromBottom, 120), Math.floor(window.innerHeight * 0.85));
+      state.landingsCustomH = h;
+      state.landingsMode = h > window.innerHeight * 0.55 ? "tall" : "mid";
+      applyLandingsMode();
+    });
+    const endDrag = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      landingBar?.classList.remove("is-resizing");
+      try {
+        handle.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      saveLandingsPrefs();
+    };
+    handle.addEventListener("pointerup", endDrag);
+    handle.addEventListener("pointercancel", endDrag);
+  }
+}
+
 // ── Landing map ──
 function renderLandings() {
   const { nodes, cables } = state.project;
@@ -1202,24 +1390,8 @@ function renderLandings() {
     }
   }
 
-  let show = nodes;
-  if (focusIds.size) {
-    show = nodes.filter((n) => focusIds.has(n.id));
-    landingContext.textContent = show.map((n) => n.tag).join(" · ");
-  } else {
-    show = nodes.slice(0, 6);
-    landingContext.textContent = nodes.length
-      ? `Showing ${show.length} of ${nodes.length} — select a node for detail`
-      : "Select a node to view terminal map";
-  }
-
-  if (!show.length) {
-    landingMap.innerHTML = `<div class="landing-placeholder">Place devices and junction boxes, then draw cables between terminals.</div>`;
-    return;
-  }
-
-  // map terminal occupancy
-  const occupancy = new Map(); // nodeId:termId -> [{cableId, color, other}]
+  // occupancy first (needed for stats + cards)
+  const occupancy = new Map();
   for (const cable of cables) {
     for (const cond of cable.conductors || []) {
       const fKey = `${cable.from.nodeId}:${cond.fromTerminalId || cable.from.terminalId}`;
@@ -1242,12 +1414,50 @@ function renderLandings() {
     }
   }
 
+  let wired = 0;
+  let open = 0;
+  for (const node of nodes) {
+    for (const t of node.terminals || []) {
+      if ((occupancy.get(`${node.id}:${t.id}`) || []).length) wired++;
+      else open++;
+    }
+  }
+  if (landingStats) {
+    landingStats.textContent = `${wired} wired · ${open} open`;
+    landingStats.classList.toggle("has-open", open > 0);
+  }
+
+  let show = nodes;
+  if (state.landingsFilter === "focus" && focusIds.size) {
+    show = nodes.filter((n) => focusIds.has(n.id));
+    landingContext.textContent = `Focused: ${show.map((n) => n.tag).join(" · ")}`;
+  } else if (state.landingsFilter === "focus" && !focusIds.size) {
+    show = nodes;
+    landingContext.textContent = nodes.length
+      ? `All ${nodes.length} devices (select one to focus) · filter: Selection`
+      : "No devices yet";
+  } else {
+    show = nodes;
+    landingContext.textContent = nodes.length
+      ? `All devices (${nodes.length})`
+      : "No devices yet";
+  }
+
+  if (!show.length) {
+    landingMap.innerHTML = `<div class="landing-placeholder">Place devices and junction boxes, then draw cables between terminals. Press <kbd>L</kbd> or use <strong>Landings</strong> in the toolbar.</div>`;
+    return;
+  }
+
   landingMap.innerHTML = show
     .map((node) => {
+      let nodeWired = 0;
+      let nodeOpen = 0;
       const terms = (node.terminals || [])
         .map((t) => {
           const occ = occupancy.get(`${node.id}:${t.id}`) || [];
           const empty = !occ.length;
+          if (empty) nodeOpen++;
+          else nodeWired++;
           const wireInfo = occ
             .map((o) => `${o.cableId} ${o.label || ""} → ${o.other}`)
             .join("; ");
@@ -1262,13 +1472,18 @@ function renderLandings() {
         })
         .join("");
 
+      const focused = focusIds.has(node.id);
       return `
-        <div class="landing-card" data-node-id="${node.id}">
+        <div class="landing-card${focused ? " is-focused" : ""}" data-node-id="${node.id}">
           <header>
             <span class="lc-title">${escapeHtml(node.tag)} — ${escapeHtml(node.name)}</span>
             <span class="badge ${node.category}">${node.category}</span>
           </header>
           <div class="lc-tag">${escapeHtml(node.location || node.type)}</div>
+          <div class="lc-summary">
+            <span class="wired">${nodeWired} wired</span>
+            <span class="open-count">${nodeOpen} open</span>
+          </div>
           <div class="landing-terminals">${terms}</div>
         </div>
       `;
@@ -1279,7 +1494,14 @@ function renderLandings() {
     card.addEventListener("click", () => {
       state.selection = { type: "node", id: card.dataset.nodeId };
       setTool("select");
+      if (state.landingsMode === "collapsed") setLandingsMode("mid");
       render();
+      // scroll card into view after re-render
+      requestAnimationFrame(() => {
+        landingMap
+          ?.querySelector(`.landing-card[data-node-id="${card.dataset.nodeId}"]`)
+          ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
     });
   });
 }
@@ -2370,6 +2592,12 @@ function onKeyDown(e) {
     if (isTyping()) return;
     setTool("cable");
   }
+  if (e.key === "l" || e.key === "L") {
+    if (isTyping()) return;
+    e.preventDefault();
+    toggleLandingsPanel();
+    return;
+  }
   if (e.key === "Escape") {
     state.cableFrom = null;
     state.placeType = null;
@@ -2429,6 +2657,7 @@ function bindUI() {
   window.addEventListener("beforeprint", preparePrintLayout);
   window.addEventListener("afterprint", restorePrintLayout);
   bindGitHubSettingsModal();
+  bindLandingsUi();
   updateGitHubBadge();
   $("#btn-import").addEventListener("click", () => fileImport.click());
   fileImport.addEventListener("change", () => {

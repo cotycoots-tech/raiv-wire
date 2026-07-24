@@ -68,6 +68,7 @@
           <button type="button" id="btn-export" class="tool" title="Export JSON">Export</button>
           <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save sync">GitHub</button>
           <button type="button" id="btn-save" class="tool primary" title="Save locally and push to GitHub (if connected)">Save</button>
+          <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
           <button type="button" id="btn-print" class="tool" title="Print / PDF">Print</button>
         </div>
       </div>
@@ -241,14 +242,29 @@
       </table>
     </section>
 
-    <!-- Bottom sheet: device landings detail -->
-    <footer class="landing-bar panel">
+    <!-- Terminal landings drawer (collapsible / resizable) -->
+    <footer id="landing-bar" class="landing-bar panel is-collapsed" aria-label="Terminal landings">
+      <div class="landing-resize-handle" id="landing-resize-handle" title="Drag to resize landings panel" role="separator" aria-orientation="horizontal"></div>
       <div class="landing-bar-header">
-        <h2>Terminal landings</h2>
-        <span id="landing-context" class="muted">Select a node to view terminal map</span>
+        <button type="button" id="btn-landings-toggle" class="landing-toggle" title="Expand or collapse terminal landings (L)" aria-expanded="false">
+          <span class="landing-chevron" aria-hidden="true">▲</span>
+          <span class="landing-title">Terminal landings</span>
+          <span id="landing-stats" class="landing-stats">0 wired · 0 open</span>
+        </button>
+        <span id="landing-context" class="muted landing-context">Select a device or cable to focus landings</span>
+        <div class="landing-bar-actions">
+          <div class="landing-filter-group" role="group" aria-label="Landing filter">
+            <button type="button" id="btn-landings-focus" class="landing-chip active" title="Show selected device / cable ends">Selection</button>
+            <button type="button" id="btn-landings-all" class="landing-chip" title="Show all devices">All</button>
+          </div>
+          <button type="button" id="btn-landings-size" class="landing-chip" title="Cycle panel size: medium / tall">Size</button>
+          <button type="button" id="btn-landings-collapse" class="landing-chip" title="Collapse panel">Collapse</button>
+        </div>
       </div>
-      <div id="landing-map" class="landing-map">
-        <div class="landing-placeholder">Place devices and junction boxes, then draw cables between terminals.</div>
+      <div class="landing-body">
+        <div id="landing-map" class="landing-map">
+          <div class="landing-placeholder">Place devices and junction boxes, then draw cables between terminals. Press <kbd>L</kbd> or click <strong>Landings</strong> to open this panel.</div>
+        </div>
       </div>
     </footer>
   </div>

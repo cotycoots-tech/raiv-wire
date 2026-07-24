@@ -50,7 +50,7 @@ python3 -m http.server 8080
 | **Cables (open)** | Multi-conductor bulk wire (power, control, signal, sensor, shielded pair) |
 | **Cables (terminated)** | Cordsets in subcategories: M12 sensor, M12 multi-pin, Ethernet, Power, Bulkhead, Valve |
 | **Wire colors** | Industrial palette (BK, RD, BU, WH, GNYE PE, BN, GY, OG, YE, VT, …) |
-| **Landings** | Per-terminal IDs/names on every node; bottom landing map shows occupancy |
+| **Landings** | Expandable bottom drawer (toolbar **Landings** or `L`): wired/open map, Selection/All filters, drag resize |
 | **Wire list** | Live table + CSV export |
 | **Projects** | Multi-project library with dropdown switcher, New / Dup / delete, auto-save (localStorage), JSON import/export, print/PDF |
 | **Save → GitHub** | **Save** stores data locally and, when connected, commits `data/*.json` to your GitHub repo via a personal access token |
@@ -71,8 +71,10 @@ python3 -m http.server 8080
 | `V` | Select |
 | `H` | Pan |
 | `C` | Cable |
+| `L` | Toggle terminal landings panel |
 | `Space` (hold) | Temporary pan |
 | `Delete` | Delete selection |
+| `Ctrl/Cmd+S` | Save (local + GitHub if connected) |
 | `Ctrl/Cmd+Z` | Undo |
 | `Ctrl/Cmd+Y` | Redo |
 | `Esc` | Cancel place/cable |
