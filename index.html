@@ -69,7 +69,7 @@
           <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save/Load sync">GitHub</button>
           <button type="button" id="btn-github-pull" class="tool" title="Pull projects & catalog from GitHub">Pull</button>
           <button type="button" id="btn-recover-catalog" class="tool" title="Restore built-in device catalog components">Recover components</button>
-          <button type="button" id="btn-factory-restore" class="tool primary" title="Restore Demo Build project + full catalog from package">Factory restore</button>
+          <button type="button" id="btn-factory-restore" class="tool primary" title="Restore Demo Build project + full catalog from package" onclick="window.factoryRestoreFromRepo && window.factoryRestoreFromRepo()">Factory restore</button>
           <button type="button" id="btn-save" class="tool primary" title="Save locally and push to GitHub (if connected)">Save</button>
           <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
           <button type="button" id="btn-wirelist" class="tool" title="Wire & cable list panel (W)" data-tool-panel="wirelist">Wire list</button>
@@ -431,5 +431,16 @@
   </div>
 
   <script type="module" src="js/app.js"></script>
+  <script>
+    // Fallback if the module fails to load — show a visible error
+    window.addEventListener("error", function (e) {
+      var el = document.getElementById("status-msg");
+      if (el && e && e.message) el.textContent = "JS error: " + e.message;
+    });
+    window.addEventListener("unhandledrejection", function (e) {
+      var el = document.getElementById("status-msg");
+      if (el && e && e.reason) el.textContent = "JS error: " + (e.reason.message || e.reason);
+    });
+  </script>
 </body>
 </html>

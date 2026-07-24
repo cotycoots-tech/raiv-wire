@@ -51,7 +51,6 @@ import {
   restoreSeedCatalog,
   ensureSeedItems,
   INVENTORY_GROUPS,
-  loadCatalog,
   getCatalogItems,
 } from "./catalog.js";
 
@@ -2570,30 +2569,74 @@ function recoverComponentsCatalog() {
  * + built-in seeds. Restores Demo Build project and complete catalog.
  */
 async function factoryRestoreFromRepo() {
-  if (
-    !confirm(
+  // Immediate feedback so a hang never looks like "no response"
+  try {
+    setStatus("Factory restore: starting…");
+  } catch {
+    /* ignore */
+  }
+
+  let proceed = true;
+  try {
+    proceed = window.confirm(
       "FACTORY RESTORE\n\nThis will reload known-good data from the app package:\n" +
         "• Full device catalog (CLICK, Staubli, Fuji, sensors, …)\n" +
         "• Demo Build project from chat/repo history\n\n" +
         "Existing projects with different IDs are kept.\n" +
         "Continue?"
-    )
-  ) {
-    return;
+    );
+  } catch {
+    proceed = true; // if confirm blocked, still restore
+  }
+  if (!proceed) {
+    setStatus("Factory restore cancelled");
+    return { ok: false, cancelled: true };
   }
 
-  updateGitHubBadge("busy");
-  setStatus("Restoring from package recovery bundle…");
+  try {
+    updateGitHubBadge("busy");
+  } catch {
+    /* ignore */
+  }
+  setStatus("Factory restore: loading recovery bundle…");
 
   try {
-    // 1) Always restore catalog seeds
+    // 1) Always restore catalog seeds (works even if fetch fails)
     restoreSeedCatalog();
+    try {
+      renderCatalogPalette();
+    } catch {
+      /* palette may not be ready */
+    }
 
-    // 2) Load recovery JSON shipped with the site
-    const url = `data/factory-recovery.json?t=${Date.now()}`;
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Could not load ${url} (${res.status})`);
-    const bundle = await res.json();
+    // 2) Load recovery JSON — try several URLs (Pages path, relative, raw GitHub)
+    const stamp = Date.now();
+    const urls = [
+      `data/factory-recovery.json?t=${stamp}`,
+      `./data/factory-recovery.json?t=${stamp}`,
+      `https://cotycoots-tech.github.io/raiv-wire/data/factory-recovery.json?t=${stamp}`,
+      `https://raw.githubusercontent.com/cotycoots-tech/raiv-wire/main/data/factory-recovery.json?t=${stamp}`,
+    ];
+    let bundle = null;
+    let lastErr = null;
+    for (const url of urls) {
+      try {
+        setStatus(`Factory restore: fetching ${url.split("?")[0]}…`);
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) {
+          lastErr = new Error(`${url} → HTTP ${res.status}`);
+          continue;
+        }
+        bundle = await res.json();
+        setStatus(`Factory restore: loaded bundle from ${url.split("?")[0]}`);
+        break;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    if (!bundle) {
+      throw lastErr || new Error("Could not load data/factory-recovery.json");
+    }
 
     if (bundle.catalog?.items) {
       try {
@@ -2617,37 +2660,49 @@ async function factoryRestoreFromRepo() {
       refreshProjectSwitcher();
     }
 
-    // 3) Also try GitHub pull (non-destructive merge)
-    const cfg = loadGitHubSettings();
-    if (canPullFromGitHub(cfg)) {
-      try {
-        await loadFromGitHub({ fromUser: false, quiet: true });
-      } catch {
-        /* ignore */
-      }
-    }
-
-    // 4) Final seed pass
+    // 3) Final seed pass (skip network pull here — keep restore fast & reliable)
     ensureSeedItems(true);
-    renderCatalogPalette();
+    try {
+      renderCatalogPalette();
+    } catch {
+      /* ignore */
+    }
     refreshProjectSwitcher();
     render();
     requestAnimationFrame(() => {
-      setView(fitView(svg, state.project));
+      try {
+        setView(fitView(svg, state.project));
+      } catch {
+        /* ignore */
+      }
       render();
     });
 
     const n = Object.keys(state.library.projects || {}).length;
     const c = (getCatalogItems() || []).length;
-    updateGitHubBadge();
-    setStatus(`Factory restore complete: ${n} project(s), ${c} catalog devices`);
-    alert(
-      `Restore complete.\n\nProjects: ${n}\nCatalog devices: ${c}\nActive: ${state.project.name}\n\n` +
-        `Click Save to push this recovered state to GitHub so all PCs can Pull it.`
-    );
+    try {
+      updateGitHubBadge();
+    } catch {
+      /* ignore */
+    }
+    setStatus(`Factory restore complete: ${n} project(s), ${c} catalog devices — click Save to push to GitHub`);
+    try {
+      window.alert(
+        `Restore complete.\n\nProjects: ${n}\nCatalog devices: ${c}\nActive: ${state.project?.name || "—"}\n\n` +
+          `Click Save to push this recovered state to GitHub so all PCs can Pull it.`
+      );
+    } catch {
+      /* ignore */
+    }
+    return { ok: true, projectCount: n, catalogCount: c };
   } catch (err) {
-    updateGitHubBadge("err");
-    setStatus("Factory restore failed: " + err.message);
+    console.error("Factory restore failed", err);
+    try {
+      updateGitHubBadge("err");
+    } catch {
+      /* ignore */
+    }
+    setStatus("Factory restore failed: " + (err?.message || err));
     // still restore seeds at minimum
     try {
       restoreSeedCatalog();
@@ -2655,9 +2710,22 @@ async function factoryRestoreFromRepo() {
     } catch {
       /* ignore */
     }
-    alert("Factory restore failed:\n\n" + err.message + "\n\nBuilt-in components were still restored if possible.");
+    try {
+      window.alert(
+        "Factory restore failed:\n\n" +
+          (err?.message || err) +
+          "\n\nBuilt-in components were still restored if possible. Check the status bar for details."
+      );
+    } catch {
+      /* ignore */
+    }
+    return { ok: false, error: err };
   }
 }
+
+// Expose for toolbar onclick / console debugging
+window.factoryRestoreFromRepo = factoryRestoreFromRepo;
+window.recoverComponentsCatalog = recoverComponentsCatalog;
 
 function bindGitHubSettingsModal() {
   $("#gh-cancel")?.addEventListener("click", () => {
@@ -3200,9 +3268,19 @@ function bindUI() {
       recoverComponentsCatalog();
     }
   });
-  $("#btn-factory-restore")?.addEventListener("click", () => {
-    factoryRestoreFromRepo();
-  });
+  const factoryBtn = $("#btn-factory-restore");
+  if (factoryBtn) {
+    factoryBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setStatus("Factory restore clicked…");
+      factoryRestoreFromRepo().catch((err) => {
+        console.error(err);
+        setStatus("Factory restore error: " + (err?.message || err));
+        alert("Factory restore error:\n" + (err?.message || err));
+      });
+    });
+  }
   $("#btn-print").addEventListener("click", () => printToPdf());
   window.addEventListener("beforeprint", preparePrintLayout);
   window.addEventListener("afterprint", restorePrintLayout);
