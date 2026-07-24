@@ -62,6 +62,8 @@
         </div>
         <div class="tool-group">
           <button type="button" id="btn-new" class="tool" title="New project">New</button>
+          <button type="button" id="btn-duplicate-project" class="tool" title="Duplicate current project">Dup</button>
+          <button type="button" id="btn-delete-project" class="tool danger" title="Delete current project">Del proj</button>
           <button type="button" id="btn-import" class="tool" title="Import JSON">Import</button>
           <button type="button" id="btn-export" class="tool" title="Export JSON">Export</button>
           <button type="button" id="btn-print" class="tool primary" title="Print / PDF">Print</button>
@@ -69,6 +71,10 @@
       </div>
 
       <div class="project-meta">
+        <label class="project-switcher-wrap" title="Switch between saved projects">
+          <span class="project-switcher-label">Project</span>
+          <select id="project-switcher" aria-label="Switch project"></select>
+        </label>
         <input type="text" id="project-name" value="Untitled Machine" placeholder="Project name" />
         <span id="status-msg" class="status-msg">Ready</span>
       </div>

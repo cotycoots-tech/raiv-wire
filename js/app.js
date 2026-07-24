@@ -69,9 +69,12 @@ const state = {
   printRestore: null,
   placeCatalogId: null, // inventory catalog item to place
   catalogFilter: "",
+  /** @type {{ activeId: string, projects: Record<string, object> }} */
+  library: { activeId: "", projects: {} },
 };
 
-const STORAGE_KEY = "raiv-wire-project-v1";
+const STORAGE_KEY = "raiv-wire-project-v1"; // legacy single-project key
+const LIBRARY_KEY = "raiv-wire-library-v1"; // multi-project library
 
 // ── DOM ──
 const $ = (sel) => document.querySelector(sel);
@@ -190,6 +193,16 @@ function render() {
   renderLandings();
   projectNameInput.value = state.project.name || "";
   updateZoomLabel();
+  // Keep active project label in sync (device counts, name)
+  const sel = $("#project-switcher");
+  if (sel && state.project?.id) {
+    const opt = [...sel.options].find((o) => o.value === state.project.id);
+    if (opt) {
+      const count = (state.project.nodes || []).length;
+      const label = `${state.project.name || "Untitled"} (${count} devices)`;
+      if (opt.textContent !== label) opt.textContent = label;
+    }
+  }
   persistDebounced();
 }
 
@@ -1733,17 +1746,28 @@ function importJSON(file) {
     try {
       const data = JSON.parse(reader.result);
       if (!data.nodes || !data.cables) throw new Error("Invalid project file");
-      pushHistory();
-      state.project = {
-        ...createEmptyProject(),
+      saveCurrentProjectNow();
+      const project = {
+        ...createEmptyProject(data.name || "Imported project"),
         ...data,
+        id: uid("proj"), // always new entry in library
         nodes: data.nodes || [],
         cables: data.cables || [],
         view: data.view || { x: 0, y: 0, scale: 1 },
+        updatedAt: new Date().toISOString(),
       };
+      if (!project.createdAt) project.createdAt = project.updatedAt;
+      state.library.projects[project.id] = deepClone(project);
+      state.library.activeId = project.id;
+      state.project = project;
       state.selection = null;
+      state.history = [];
+      state.future = [];
+      state.dirty = false;
+      persistLibraryNow();
+      refreshProjectSwitcher();
       render();
-      setStatus("Imported project");
+      setStatus(`Imported as new project: ${project.name}`);
     } catch (err) {
       setStatus("Import failed");
       alert("Could not import file: " + err.message);
@@ -1753,40 +1777,237 @@ function importJSON(file) {
 }
 
 function newProject() {
-  if (state.dirty && !confirm("Start a new project? Unsaved changes may be lost (export first if needed).")) {
-    return;
-  }
-  state.project = createEmptyProject();
+  const name = prompt("New project name:", nextDefaultProjectName());
+  if (name === null) return;
+  saveCurrentProjectNow();
+  const project = createEmptyProject(name.trim() || nextDefaultProjectName());
+  // Blank canvas by default; optional demo via confirm
+  const withDemo = confirm(
+    "Load the demo packer-line starter on this project?\n\nOK = demo starter\nCancel = blank canvas"
+  );
+  state.project = project;
   state.selection = null;
   state.history = [];
   state.future = [];
   state.dirty = false;
-  seedDemo();
+  if (withDemo) seedDemo();
+  state.library.projects[project.id] = deepClone(state.project);
+  state.library.activeId = project.id;
+  persistLibraryNow();
+  refreshProjectSwitcher();
   render();
-  setStatus("New project");
+  requestAnimationFrame(() => {
+    setView(fitView(svg, state.project));
+    render();
+  });
+  setStatus(`New project: ${state.project.name}`);
 }
 
-// ── Persistence ──
+function duplicateProject() {
+  saveCurrentProjectNow();
+  const src = deepClone(state.project);
+  const copy = {
+    ...src,
+    id: uid("proj"),
+    name: `${src.name || "Project"} (copy)`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  state.library.projects[copy.id] = copy;
+  state.library.activeId = copy.id;
+  state.project = deepClone(copy);
+  state.selection = null;
+  state.history = [];
+  state.future = [];
+  state.dirty = false;
+  persistLibraryNow();
+  refreshProjectSwitcher();
+  render();
+  setStatus(`Duplicated project: ${copy.name}`);
+}
+
+function deleteCurrentProject() {
+  const ids = Object.keys(state.library.projects);
+  if (ids.length <= 1) {
+    alert("Cannot delete the only project. Create another project first, or use New.");
+    return;
+  }
+  const name = state.project.name || "this project";
+  if (!confirm(`Delete project "${name}"?\n\nThis cannot be undone (export JSON first if you need a backup).`)) {
+    return;
+  }
+  const delId = state.project.id;
+  delete state.library.projects[delId];
+  const nextId =
+    Object.keys(state.library.projects).sort((a, b) => {
+      const ua = state.library.projects[a].updatedAt || "";
+      const ub = state.library.projects[b].updatedAt || "";
+      return ub.localeCompare(ua);
+    })[0];
+  state.library.activeId = nextId;
+  state.project = deepClone(state.library.projects[nextId]);
+  ensureProjectId(state.project);
+  state.selection = null;
+  state.history = [];
+  state.future = [];
+  state.dirty = false;
+  persistLibraryNow();
+  refreshProjectSwitcher();
+  render();
+  setStatus(`Deleted project. Now editing: ${state.project.name}`);
+}
+
+function nextDefaultProjectName() {
+  const n = Object.keys(state.library.projects || {}).length + 1;
+  return `Project ${n}`;
+}
+
+// ── Multi-project library persistence ──
 let persistTimer;
+
+function ensureProjectId(project) {
+  if (!project.id) project.id = uid("proj");
+  return project.id;
+}
+
+function saveCurrentProjectNow() {
+  try {
+    if (projectNameInput) {
+      state.project.name = projectNameInput.value || state.project.name;
+    }
+    state.project.updatedAt = new Date().toISOString();
+    ensureProjectId(state.project);
+    if (!state.library.projects) state.library.projects = {};
+    state.library.projects[state.project.id] = deepClone(state.project);
+    state.library.activeId = state.project.id;
+    // also keep legacy key in sync for older tools
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.project));
+  } catch {
+    /* quota */
+  }
+}
+
+function persistLibraryNow() {
+  try {
+    saveCurrentProjectNow();
+    localStorage.setItem(
+      LIBRARY_KEY,
+      JSON.stringify({
+        version: 1,
+        activeId: state.library.activeId,
+        projects: state.library.projects,
+      })
+    );
+  } catch {
+    /* quota */
+  }
+}
+
 function persistDebounced() {
   clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
-    try {
-      state.project.name = projectNameInput.value || state.project.name;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.project));
-    } catch {
-      /* quota */
-    }
+    persistLibraryNow();
+    state.dirty = false;
   }, 400);
+}
+
+function listLibraryProjects() {
+  return Object.values(state.library.projects || {}).sort((a, b) => {
+    const ua = a.updatedAt || a.createdAt || "";
+    const ub = b.updatedAt || b.createdAt || "";
+    return ub.localeCompare(ua);
+  });
+}
+
+function refreshProjectSwitcher() {
+  const sel = $("#project-switcher");
+  if (!sel) return;
+  const items = listLibraryProjects();
+  const active = state.project?.id || state.library.activeId;
+  sel.innerHTML = items
+    .map((p) => {
+      const label = escapeHtml(p.name || "Untitled");
+      const count = (p.nodes || []).length;
+      const text = `${label} (${count} devices)`;
+      return `<option value="${escapeAttr(p.id)}" ${p.id === active ? "selected" : ""}>${text}</option>`;
+    })
+    .join("");
+  if (!items.length) {
+    sel.innerHTML = `<option value="">No projects</option>`;
+  }
+}
+
+function switchToProject(projectId) {
+  if (!projectId || projectId === state.project.id) return;
+  const target = state.library.projects[projectId];
+  if (!target) {
+    setStatus("Project not found");
+    refreshProjectSwitcher();
+    return;
+  }
+  saveCurrentProjectNow();
+  persistLibraryNow();
+  state.project = deepClone(target);
+  ensureProjectId(state.project);
+  state.library.activeId = state.project.id;
+  state.selection = null;
+  state.cableFrom = null;
+  state.history = [];
+  state.future = [];
+  state.dirty = false;
+  persistLibraryNow();
+  refreshProjectSwitcher();
+  render();
+  requestAnimationFrame(() => {
+    applyViewport(viewportEl, state.project.view || { x: 0, y: 0, scale: 1 });
+    render();
+  });
+  setStatus(`Switched to: ${state.project.name}`);
 }
 
 function loadPersisted() {
   try {
+    // Prefer multi-project library
+    const libRaw = localStorage.getItem(LIBRARY_KEY);
+    if (libRaw) {
+      const lib = JSON.parse(libRaw);
+      if (lib.projects && typeof lib.projects === "object") {
+        state.library.projects = lib.projects;
+        // normalize ids
+        for (const [key, p] of Object.entries(state.library.projects)) {
+          if (!p.id) p.id = key;
+          ensureProjectId(p);
+          if (p.id !== key) {
+            state.library.projects[p.id] = p;
+            delete state.library.projects[key];
+          }
+        }
+        let activeId = lib.activeId;
+        if (!activeId || !state.library.projects[activeId]) {
+          activeId = Object.keys(state.library.projects)[0];
+        }
+        if (activeId && state.library.projects[activeId]) {
+          state.library.activeId = activeId;
+          state.project = deepClone(state.library.projects[activeId]);
+          ensureProjectId(state.project);
+          return true;
+        }
+      }
+    }
+
+    // Migrate legacy single project
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     const data = JSON.parse(raw);
     if (!data.nodes) return false;
-    state.project = { ...createEmptyProject(), ...data };
+    const project = { ...createEmptyProject(), ...data };
+    ensureProjectId(project);
+    state.library = {
+      activeId: project.id,
+      projects: { [project.id]: deepClone(project) },
+    };
+    state.project = project;
+    persistLibraryNow();
     return true;
   } catch {
     return false;
@@ -2028,6 +2249,8 @@ function bindUI() {
   $("#btn-redo").addEventListener("click", redo);
   $("#btn-delete").addEventListener("click", deleteSelection);
   $("#btn-new").addEventListener("click", newProject);
+  $("#btn-duplicate-project")?.addEventListener("click", duplicateProject);
+  $("#btn-delete-project")?.addEventListener("click", deleteCurrentProject);
   $("#btn-export").addEventListener("click", exportJSON);
   $("#btn-export-csv").addEventListener("click", exportCSV);
   $("#btn-print").addEventListener("click", () => printToPdf());
@@ -2043,6 +2266,20 @@ function bindUI() {
     pushHistory();
     state.project.name = projectNameInput.value;
     persistDebounced();
+    refreshProjectSwitcher();
+  });
+  projectNameInput.addEventListener("input", () => {
+    // live-update dropdown label without full persist
+    const sel = $("#project-switcher");
+    if (!sel || !state.project?.id) return;
+    const opt = [...sel.options].find((o) => o.value === state.project.id);
+    if (opt) {
+      const count = (state.project.nodes || []).length;
+      opt.textContent = `${projectNameInput.value || "Untitled"} (${count} devices)`;
+    }
+  });
+  $("#project-switcher")?.addEventListener("change", (e) => {
+    switchToProject(e.target.value);
   });
 
   svg.addEventListener("pointerdown", onPointerDown);
@@ -2097,17 +2334,47 @@ function init() {
   buildPalette();
   bindUI();
   const loaded = loadPersisted();
-  if (!loaded || !state.project.nodes.length) {
+  if (!loaded) {
+    // First run: create demo project in library
+    state.project = createEmptyProject("Demo Packer Line");
     seedDemo();
+    ensureProjectId(state.project);
+    state.library = {
+      activeId: state.project.id,
+      projects: { [state.project.id]: deepClone(state.project) },
+    };
+    persistLibraryNow();
+  } else {
+    ensureProjectId(state.project);
+    if (!state.library.projects[state.project.id]) {
+      state.library.projects[state.project.id] = deepClone(state.project);
+      state.library.activeId = state.project.id;
+      persistLibraryNow();
+    }
   }
+  refreshProjectSwitcher();
   setTool("select");
   render();
   // fit after layout
   requestAnimationFrame(() => {
     if (!loaded) setView(fitView(svg, state.project));
-    else applyViewport(viewportEl, state.project.view);
+    else applyViewport(viewportEl, state.project.view || { x: 0, y: 0, scale: 1 });
     render();
-    setStatus(loaded ? "Restored last session" : "Demo project loaded — edit or start New");
+    const n = Object.keys(state.library.projects).length;
+    setStatus(
+      loaded
+        ? `Restored: ${state.project.name} (${n} project${n === 1 ? "" : "s"} in library)`
+        : "Demo project loaded — use Project dropdown or New to add more"
+    );
+  });
+
+  // Save active project when leaving the page
+  window.addEventListener("beforeunload", () => {
+    try {
+      persistLibraryNow();
+    } catch {
+      /* ignore */
+    }
   });
 }
 

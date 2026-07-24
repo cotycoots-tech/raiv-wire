@@ -188,11 +188,56 @@ button {
 .project-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.project-switcher-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px 3px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.project-switcher-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+#project-switcher {
+  min-width: 160px;
+  max-width: 220px;
+  padding: 5px 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#project-switcher:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+#project-switcher option {
+  background: var(--bg-panel);
+  color: var(--text);
 }
 
 #project-name {
-  width: 180px;
+  width: 160px;
   padding: 6px 10px;
   background: var(--bg);
   border: 1px solid var(--border);
@@ -211,6 +256,16 @@ button {
   color: var(--text-dim);
   min-width: 80px;
   text-align: right;
+}
+
+@media (max-width: 1200px) {
+  #project-switcher {
+    min-width: 120px;
+    max-width: 160px;
+  }
+  #project-name {
+    width: 120px;
+  }
 }
 
 /* ── Workspace ── */

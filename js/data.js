@@ -1334,6 +1334,7 @@ export function nextCableId(cables) {
 export function createEmptyProject(name = "Untitled Machine") {
   return {
     version: 1,
+    id: uid("proj"),
     name,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

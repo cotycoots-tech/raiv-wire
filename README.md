@@ -45,7 +45,7 @@ python3 -m http.server 8080
 | **Wire colors** | Industrial palette (BK, RD, BU, WH, GNYE PE, BN, GY, OG, YE, VT, …) |
 | **Landings** | Per-terminal IDs/names on every node; bottom landing map shows occupancy |
 | **Wire list** | Live table + CSV export |
-| **Project** | Auto-save (localStorage), JSON import/export, print/PDF |
+| **Projects** | Multi-project library with dropdown switcher, New / Dup / delete, auto-save (localStorage), JSON import/export, print/PDF |
 
 ## How to use
 
