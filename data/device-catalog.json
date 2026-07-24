@@ -1,7 +1,7 @@
 {
   "version": 1,
   "type": "raiv-wire-device-catalog",
-  "exportedAt": "2026-07-24T20:00:00.000Z",
+  "exportedAt": "2026-07-24T20:25:59.883Z",
   "items": [
     {
       "id": "seed_plc_s7",
@@ -122,348 +122,6 @@
       ]
     },
     {
-      "id": "seed_click_c0_10dd2e_d",
-      "catalogName": "CLICK PLC C0-10DD2E-D",
-      "inventoryGroup": "plc",
-      "baseType": "plc",
-      "tagPrefix": "PLC",
-      "name": "CLICK C0-10DD2E-D",
-      "manufacturer": "AutomationDirect / CLICK",
-      "partNumber": "C0-10DD2E-D",
-      "description": "CLICK Plus PLC \u2014 8 DC inputs, 6 DC sinking outputs, Ethernet. Stackable I/O option.",
-      "width": 150,
-      "height": 120,
-      "terminals": [
-        {
-          "id": "+V",
-          "name": "+24V DC power"
-        },
-        {
-          "id": "0V",
-          "name": "0V / DC common"
-        },
-        {
-          "id": "FG",
-          "name": "FG / PE"
-        },
-        {
-          "id": "ETH",
-          "name": "Ethernet"
-        },
-        {
-          "id": "X1",
-          "name": "X1 DI"
-        },
-        {
-          "id": "X2",
-          "name": "X2 DI"
-        },
-        {
-          "id": "X3",
-          "name": "X3 DI"
-        },
-        {
-          "id": "X4",
-          "name": "X4 DI"
-        },
-        {
-          "id": "X5",
-          "name": "X5 DI"
-        },
-        {
-          "id": "X6",
-          "name": "X6 DI"
-        },
-        {
-          "id": "X7",
-          "name": "X7 DI"
-        },
-        {
-          "id": "X8",
-          "name": "X8 DI"
-        },
-        {
-          "id": "C0",
-          "name": "Input common C0"
-        },
-        {
-          "id": "Y1",
-          "name": "Y1 DO sink"
-        },
-        {
-          "id": "Y2",
-          "name": "Y2 DO sink"
-        },
-        {
-          "id": "Y3",
-          "name": "Y3 DO sink"
-        },
-        {
-          "id": "Y4",
-          "name": "Y4 DO sink"
-        },
-        {
-          "id": "Y5",
-          "name": "Y5 DO sink"
-        },
-        {
-          "id": "Y6",
-          "name": "Y6 DO sink"
-        },
-        {
-          "id": "C1",
-          "name": "Output common C1"
-        }
-      ]
-    },
-    {
-      "id": "seed_stridelinx_se_sl3011_wf",
-      "catalogName": "StrideLinx VPN Router PRO SE-SL3011-WF",
-      "inventoryGroup": "io",
-      "baseType": "plc",
-      "tagPrefix": "RTR",
-      "name": "StrideLinx SE-SL3011-WF",
-      "manufacturer": "AutomationDirect / StrideLinx",
-      "partNumber": "SE-SL3011-WF",
-      "description": "StrideLinx VPN Router PRO with Wi\u2011Fi \u2014 remote access VPN, LAN/WAN Ethernet, wireless. DIN-rail industrial router.",
-      "width": 140,
-      "height": 110,
-      "terminals": [
-        {
-          "id": "+V",
-          "name": "+24V DC power"
-        },
-        {
-          "id": "0V",
-          "name": "0V / DC common"
-        },
-        {
-          "id": "PE",
-          "name": "PE / FG"
-        },
-        {
-          "id": "WAN",
-          "name": "WAN Ethernet"
-        },
-        {
-          "id": "LAN1",
-          "name": "LAN 1"
-        },
-        {
-          "id": "LAN2",
-          "name": "LAN 2"
-        },
-        {
-          "id": "LAN3",
-          "name": "LAN 3"
-        },
-        {
-          "id": "LAN4",
-          "name": "LAN 4"
-        },
-        {
-          "id": "WIFI",
-          "name": "Wi\u2011Fi antenna"
-        },
-        {
-          "id": "VPN",
-          "name": "VPN tunnel (logical)"
-        },
-        {
-          "id": "DI1",
-          "name": "DI 1 (status/I/O)"
-        },
-        {
-          "id": "DO1",
-          "name": "DO 1 (status/I/O)"
-        }
-      ]
-    },
-    {
-      "id": "seed_staubli_d244030_ecat",
-      "catalogName": "Staubli D244030 EtherCAT 8DI+4DO",
-      "inventoryGroup": "io",
-      "baseType": "plc",
-      "tagPrefix": "EC",
-      "name": "EtherCAT coupler 8DI+4DO",
-      "manufacturer": "St\u00e4ubli",
-      "partNumber": "D 244 030 00",
-      "seedRevision": 2,
-      "description": "EtherCAT coupler 8 DI + 4 DO (D 244 030 00), equivalent to Beckhoff EK1818. S/N 50220013. Terminal points 1\u201316 per St\u00e4ubli wiring diagram.",
-      "width": 150,
-      "height": 130,
-      "terminals": [
-        {
-          "id": "EC-IN",
-          "name": "Link/Act In EtherCAT"
-        },
-        {
-          "id": "EC-OUT",
-          "name": "Link/Act Out EtherCAT"
-        },
-        {
-          "id": "1",
-          "name": "Us +24 V (bus coupler / E-bus)"
-        },
-        {
-          "id": "2",
-          "name": "Input 1"
-        },
-        {
-          "id": "3",
-          "name": "Input 3"
-        },
-        {
-          "id": "4",
-          "name": "Input 5"
-        },
-        {
-          "id": "5",
-          "name": "Input 7"
-        },
-        {
-          "id": "6",
-          "name": "Up +24 V (power contacts)"
-        },
-        {
-          "id": "7",
-          "name": "Output 1"
-        },
-        {
-          "id": "8",
-          "name": "Output 3"
-        },
-        {
-          "id": "9",
-          "name": "Us 0 V (bus coupler / E-bus)"
-        },
-        {
-          "id": "10",
-          "name": "Input 2"
-        },
-        {
-          "id": "11",
-          "name": "Input 4"
-        },
-        {
-          "id": "12",
-          "name": "Input 6"
-        },
-        {
-          "id": "13",
-          "name": "Input 8"
-        },
-        {
-          "id": "14",
-          "name": "Up 0 V (power contacts)"
-        },
-        {
-          "id": "15",
-          "name": "Output 2"
-        },
-        {
-          "id": "16",
-          "name": "Output 4"
-        },
-        {
-          "id": "SN",
-          "name": "S/N 50220013"
-        }
-      ]
-    },
-    {
-      "id": "seed_staubli_d244031_ecat",
-      "catalogName": "Staubli D244031 EtherCAT 8DI/8DO",
-      "inventoryGroup": "io",
-      "baseType": "plc",
-      "tagPrefix": "EC",
-      "name": "EtherCAT digital 8 DI/DO",
-      "manufacturer": "St\u00e4ubli",
-      "partNumber": "D 244 031 00",
-      "seedRevision": 2,
-      "description": "Module EtherCAT digital 8 DI/DO (D 244 031 00), equivalent to Beckhoff EL1859. S/N 15240008. Terminal points 1\u201316 per St\u00e4ubli wiring diagram \u00a76.2.2.",
-      "width": 140,
-      "height": 130,
-      "terminals": [
-        {
-          "id": "PC+24",
-          "name": "Power contact +24 V"
-        },
-        {
-          "id": "PC0V",
-          "name": "Power contact 0 V"
-        },
-        {
-          "id": "1",
-          "name": "Input 1"
-        },
-        {
-          "id": "2",
-          "name": "Input 2"
-        },
-        {
-          "id": "3",
-          "name": "Input 3"
-        },
-        {
-          "id": "4",
-          "name": "Input 4"
-        },
-        {
-          "id": "5",
-          "name": "Input 5"
-        },
-        {
-          "id": "6",
-          "name": "Input 6"
-        },
-        {
-          "id": "7",
-          "name": "Input 7"
-        },
-        {
-          "id": "8",
-          "name": "Input 8"
-        },
-        {
-          "id": "9",
-          "name": "Output 1"
-        },
-        {
-          "id": "10",
-          "name": "Output 2"
-        },
-        {
-          "id": "11",
-          "name": "Output 3"
-        },
-        {
-          "id": "12",
-          "name": "Output 4"
-        },
-        {
-          "id": "13",
-          "name": "Output 5"
-        },
-        {
-          "id": "14",
-          "name": "Output 6"
-        },
-        {
-          "id": "15",
-          "name": "Output 7"
-        },
-        {
-          "id": "16",
-          "name": "Output 8"
-        },
-        {
-          "id": "SN",
-          "name": "S/N 15240008"
-        }
-      ]
-    },
-    {
       "id": "seed_vfd_pf525",
       "catalogName": "PowerFlex 525",
       "inventoryGroup": "drives",
@@ -557,7 +215,7 @@
         },
         {
           "id": "TS-",
-          "name": "Therm \u2212"
+          "name": "Therm −"
         }
       ]
     },
@@ -728,7 +386,7 @@
         },
         {
           "id": "LED-",
-          "name": "Lamp \u2212"
+          "name": "Lamp −"
         }
       ]
     },
@@ -987,6 +645,348 @@
         {
           "id": "DO1",
           "name": "DO 1"
+        }
+      ]
+    },
+    {
+      "id": "seed_click_c0_10dd2e_d",
+      "catalogName": "CLICK PLC C0-10DD2E-D",
+      "inventoryGroup": "plc",
+      "baseType": "plc",
+      "tagPrefix": "PLC",
+      "name": "CLICK C0-10DD2E-D",
+      "manufacturer": "AutomationDirect / CLICK",
+      "partNumber": "C0-10DD2E-D",
+      "description": "CLICK Plus PLC — 8 DC inputs, 6 DC sinking outputs, Ethernet. Stackable I/O option.",
+      "width": 150,
+      "height": 120,
+      "terminals": [
+        {
+          "id": "+V",
+          "name": "+24V DC power"
+        },
+        {
+          "id": "0V",
+          "name": "0V / DC common"
+        },
+        {
+          "id": "FG",
+          "name": "FG / PE"
+        },
+        {
+          "id": "ETH",
+          "name": "Ethernet"
+        },
+        {
+          "id": "X1",
+          "name": "X1 DI"
+        },
+        {
+          "id": "X2",
+          "name": "X2 DI"
+        },
+        {
+          "id": "X3",
+          "name": "X3 DI"
+        },
+        {
+          "id": "X4",
+          "name": "X4 DI"
+        },
+        {
+          "id": "X5",
+          "name": "X5 DI"
+        },
+        {
+          "id": "X6",
+          "name": "X6 DI"
+        },
+        {
+          "id": "X7",
+          "name": "X7 DI"
+        },
+        {
+          "id": "X8",
+          "name": "X8 DI"
+        },
+        {
+          "id": "C0",
+          "name": "Input common C0"
+        },
+        {
+          "id": "Y1",
+          "name": "Y1 DO sink"
+        },
+        {
+          "id": "Y2",
+          "name": "Y2 DO sink"
+        },
+        {
+          "id": "Y3",
+          "name": "Y3 DO sink"
+        },
+        {
+          "id": "Y4",
+          "name": "Y4 DO sink"
+        },
+        {
+          "id": "Y5",
+          "name": "Y5 DO sink"
+        },
+        {
+          "id": "Y6",
+          "name": "Y6 DO sink"
+        },
+        {
+          "id": "C1",
+          "name": "Output common C1"
+        }
+      ]
+    },
+    {
+      "id": "seed_stridelinx_se_sl3011_wf",
+      "catalogName": "StrideLinx VPN Router PRO SE-SL3011-WF",
+      "inventoryGroup": "io",
+      "baseType": "plc",
+      "tagPrefix": "RTR",
+      "name": "StrideLinx SE-SL3011-WF",
+      "manufacturer": "AutomationDirect / StrideLinx",
+      "partNumber": "SE-SL3011-WF",
+      "description": "StrideLinx VPN Router PRO with Wi‑Fi — remote access VPN, LAN/WAN Ethernet, wireless. DIN-rail industrial router.",
+      "width": 140,
+      "height": 110,
+      "terminals": [
+        {
+          "id": "+V",
+          "name": "+24V DC power"
+        },
+        {
+          "id": "0V",
+          "name": "0V / DC common"
+        },
+        {
+          "id": "PE",
+          "name": "PE / FG"
+        },
+        {
+          "id": "WAN",
+          "name": "WAN Ethernet"
+        },
+        {
+          "id": "LAN1",
+          "name": "LAN 1"
+        },
+        {
+          "id": "LAN2",
+          "name": "LAN 2"
+        },
+        {
+          "id": "LAN3",
+          "name": "LAN 3"
+        },
+        {
+          "id": "LAN4",
+          "name": "LAN 4"
+        },
+        {
+          "id": "WIFI",
+          "name": "Wi‑Fi antenna"
+        },
+        {
+          "id": "VPN",
+          "name": "VPN tunnel (logical)"
+        },
+        {
+          "id": "DI1",
+          "name": "DI 1 (status/I/O)"
+        },
+        {
+          "id": "DO1",
+          "name": "DO 1 (status/I/O)"
+        }
+      ]
+    },
+    {
+      "id": "seed_staubli_d244030_ecat",
+      "catalogName": "Staubli D244030 EtherCAT 8DI+4DO",
+      "inventoryGroup": "io",
+      "baseType": "plc",
+      "tagPrefix": "EC",
+      "name": "EtherCAT coupler 8DI+4DO",
+      "manufacturer": "Stäubli",
+      "partNumber": "D 244 030 00",
+      "seedRevision": 2,
+      "description": "EtherCAT coupler 8 DI + 4 DO (D 244 030 00), equivalent to Beckhoff EK1818. S/N 50220013. Terminal points 1–16 per Stäubli wiring diagram.",
+      "width": 150,
+      "height": 130,
+      "terminals": [
+        {
+          "id": "EC-IN",
+          "name": "Link/Act In EtherCAT"
+        },
+        {
+          "id": "EC-OUT",
+          "name": "Link/Act Out EtherCAT"
+        },
+        {
+          "id": "1",
+          "name": "Us +24 V (bus coupler / E-bus)"
+        },
+        {
+          "id": "2",
+          "name": "Input 1"
+        },
+        {
+          "id": "3",
+          "name": "Input 3"
+        },
+        {
+          "id": "4",
+          "name": "Input 5"
+        },
+        {
+          "id": "5",
+          "name": "Input 7"
+        },
+        {
+          "id": "6",
+          "name": "Up +24 V (power contacts)"
+        },
+        {
+          "id": "7",
+          "name": "Output 1"
+        },
+        {
+          "id": "8",
+          "name": "Output 3"
+        },
+        {
+          "id": "9",
+          "name": "Us 0 V (bus coupler / E-bus)"
+        },
+        {
+          "id": "10",
+          "name": "Input 2"
+        },
+        {
+          "id": "11",
+          "name": "Input 4"
+        },
+        {
+          "id": "12",
+          "name": "Input 6"
+        },
+        {
+          "id": "13",
+          "name": "Input 8"
+        },
+        {
+          "id": "14",
+          "name": "Up 0 V (power contacts)"
+        },
+        {
+          "id": "15",
+          "name": "Output 2"
+        },
+        {
+          "id": "16",
+          "name": "Output 4"
+        },
+        {
+          "id": "SN",
+          "name": "S/N 50220013"
+        }
+      ]
+    },
+    {
+      "id": "seed_staubli_d244031_ecat",
+      "catalogName": "Staubli D244031 EtherCAT 8DI/8DO",
+      "inventoryGroup": "io",
+      "baseType": "plc",
+      "tagPrefix": "EC",
+      "name": "EtherCAT digital 8 DI/DO",
+      "manufacturer": "Stäubli",
+      "partNumber": "D 244 031 00",
+      "seedRevision": 2,
+      "description": "Module EtherCAT digital 8 DI/DO (D 244 031 00), equivalent to Beckhoff EL1859. S/N 15240008. Terminal points 1–16 per Stäubli wiring diagram §6.2.2.",
+      "width": 140,
+      "height": 130,
+      "terminals": [
+        {
+          "id": "PC+24",
+          "name": "Power contact +24 V"
+        },
+        {
+          "id": "PC0V",
+          "name": "Power contact 0 V"
+        },
+        {
+          "id": "1",
+          "name": "Input 1"
+        },
+        {
+          "id": "2",
+          "name": "Input 2"
+        },
+        {
+          "id": "3",
+          "name": "Input 3"
+        },
+        {
+          "id": "4",
+          "name": "Input 4"
+        },
+        {
+          "id": "5",
+          "name": "Input 5"
+        },
+        {
+          "id": "6",
+          "name": "Input 6"
+        },
+        {
+          "id": "7",
+          "name": "Input 7"
+        },
+        {
+          "id": "8",
+          "name": "Input 8"
+        },
+        {
+          "id": "9",
+          "name": "Output 1"
+        },
+        {
+          "id": "10",
+          "name": "Output 2"
+        },
+        {
+          "id": "11",
+          "name": "Output 3"
+        },
+        {
+          "id": "12",
+          "name": "Output 4"
+        },
+        {
+          "id": "13",
+          "name": "Output 5"
+        },
+        {
+          "id": "14",
+          "name": "Output 6"
+        },
+        {
+          "id": "15",
+          "name": "Output 7"
+        },
+        {
+          "id": "16",
+          "name": "Output 8"
+        },
+        {
+          "id": "SN",
+          "name": "S/N 15240008"
         }
       ]
     }
