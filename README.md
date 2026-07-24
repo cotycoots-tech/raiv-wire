@@ -16,10 +16,17 @@ Hosted from this repository via GitHub Pages (Actions deploy on every push to `m
 |------|---------------------------|
 | **Hosting** | GitHub Pages serves the static app (HTML/CSS/JS) |
 | **Project / catalog storage** | Browser **localStorage** (per user, per browser) |
-| **Sharing projects / catalogs** | Export JSON / Excel / CSV, then import on another machine |
+| **Save to GitHub** | **Save** button + **GitHub** settings: PAT pushes `data/projects-library.json`, `data/device-catalog.json`, `data/active-project.json` |
+| **Sharing projects / catalogs** | Export JSON / Excel / CSV, or pull the `data/` files from the repo |
 | **Source control** | This GitHub repo |
 
-GitHub Pages is static hosting only — it does not provide a shared cloud database. Use Export/Import to move work between browsers or teammates.
+#### Connect Save → GitHub
+
+1. Create a [fine-grained PAT](https://github.com/settings/personal-access-tokens) with **Contents: Read and write** on `cotycoots-tech/raiv-wire`.
+2. On the site, click **GitHub**, enter owner / repo / branch / token, enable auto-sync, **Test connection**, **Save settings**.
+3. Click **Save** anytime to update the repo `data/` files.
+
+The token stays in your browser only. Do not commit tokens into the repository.
 
 ## Quick start (local)
 
@@ -46,6 +53,7 @@ python3 -m http.server 8080
 | **Landings** | Per-terminal IDs/names on every node; bottom landing map shows occupancy |
 | **Wire list** | Live table + CSV export |
 | **Projects** | Multi-project library with dropdown switcher, New / Dup / delete, auto-save (localStorage), JSON import/export, print/PDF |
+| **Save → GitHub** | **Save** stores data locally and, when connected, commits `data/*.json` to your GitHub repo via a personal access token |
 
 ## How to use
 

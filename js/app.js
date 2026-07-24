@@ -51,6 +51,14 @@ import {
   INVENTORY_GROUPS,
 } from "./catalog.js";
 
+import {
+  loadGitHubSettings,
+  saveGitHubSettings,
+  isGitHubConfigured,
+  testGitHubConnection,
+  syncToGitHub,
+} from "./github-sync.js";
+
 // ── State ──
 const state = {
   project: createEmptyProject(),
@@ -1862,6 +1870,163 @@ function nextDefaultProjectName() {
   return `Project ${n}`;
 }
 
+// ── Save (local + optional GitHub) ──
+function updateGitHubBadge(stateName) {
+  const badge = $("#github-sync-badge");
+  if (!badge) return;
+  const cfg = loadGitHubSettings();
+  badge.classList.remove("on", "off", "busy", "err");
+  if (stateName === "busy") {
+    badge.classList.add("busy");
+    badge.textContent = "GH · saving…";
+    return;
+  }
+  if (stateName === "err") {
+    badge.classList.add("err");
+    badge.textContent = "GH · error";
+    return;
+  }
+  if (isGitHubConfigured(cfg) && cfg.autoSync) {
+    badge.classList.add("on");
+    badge.textContent = `GH · ${cfg.owner}/${cfg.repo}`;
+    badge.title = `Connected: ${cfg.owner}/${cfg.repo}@${cfg.branch} — Save pushes data/`;
+  } else if (isGitHubConfigured(cfg)) {
+    badge.classList.add("on");
+    badge.textContent = "GH · local+ready";
+    badge.title = "Token saved; auto-sync is off. Save is local only unless you enable auto-sync.";
+  } else {
+    badge.classList.add("off");
+    badge.textContent = "GH · off";
+    badge.title = "Not connected. Click GitHub to add a personal access token.";
+  }
+}
+
+function openGitHubSettings() {
+  const s = loadGitHubSettings();
+  $("#gh-owner").value = s.owner || "";
+  $("#gh-repo").value = s.repo || "";
+  $("#gh-branch").value = s.branch || "main";
+  $("#gh-token").value = s.token || "";
+  $("#gh-autosync").value = s.autoSync ? "1" : "0";
+  $("#gh-path-projects").value = s.pathProjects || "data/projects-library.json";
+  $("#gh-path-catalog").value = s.pathCatalog || "data/device-catalog.json";
+  $("#gh-test-result").textContent = isGitHubConfigured(s)
+    ? "Token on file — test connection or update settings."
+    : "No token yet — paste a PAT with Contents read/write.";
+  $("#github-modal")?.classList.remove("hidden");
+}
+
+function readGitHubForm() {
+  return {
+    owner: ($("#gh-owner")?.value || "").trim(),
+    repo: ($("#gh-repo")?.value || "").trim(),
+    branch: ($("#gh-branch")?.value || "main").trim() || "main",
+    token: ($("#gh-token")?.value || "").trim(),
+    autoSync: $("#gh-autosync")?.value === "1",
+    pathProjects: ($("#gh-path-projects")?.value || "data/projects-library.json").trim(),
+    pathCatalog: ($("#gh-path-catalog")?.value || "data/device-catalog.json").trim(),
+    pathActive: "data/active-project.json",
+  };
+}
+
+function bindGitHubSettingsModal() {
+  $("#gh-cancel")?.addEventListener("click", () => {
+    $("#github-modal")?.classList.add("hidden");
+  });
+  $("#gh-clear-token")?.addEventListener("click", () => {
+    $("#gh-token").value = "";
+    const s = readGitHubForm();
+    s.token = "";
+    saveGitHubSettings(s);
+    updateGitHubBadge();
+    $("#gh-test-result").textContent = "Token cleared from this browser.";
+  });
+  $("#gh-save-settings")?.addEventListener("click", () => {
+    const s = readGitHubForm();
+    saveGitHubSettings(s);
+    updateGitHubBadge();
+    $("#github-modal")?.classList.add("hidden");
+    setStatus(
+      isGitHubConfigured(s)
+        ? `GitHub connected: ${s.owner}/${s.repo} (${s.autoSync ? "auto-sync on" : "auto-sync off"})`
+        : "GitHub settings saved (not fully connected — add token)"
+    );
+  });
+  $("#gh-test")?.addEventListener("click", async () => {
+    const s = readGitHubForm();
+    const el = $("#gh-test-result");
+    el.textContent = "Testing…";
+    try {
+      // Temporarily use form values without requiring save
+      const info = await testGitHubConnection(s);
+      el.textContent = `OK — ${info.fullName} (${info.private ? "private" : "public"}), default branch ${info.defaultBranch}`;
+      setStatus("GitHub connection OK");
+    } catch (err) {
+      el.textContent = `Failed: ${err.message}`;
+      setStatus("GitHub test failed");
+    }
+  });
+}
+
+/**
+ * Save locally always; push to GitHub when configured + autoSync (or forceGithub).
+ */
+async function saveAll({ fromUser = false, forceGithub = false } = {}) {
+  const btn = $("#btn-save");
+  btn?.classList.add("saving");
+  try {
+    persistLibraryNow();
+    state.dirty = false;
+
+    const cfg = loadGitHubSettings();
+    const shouldSync = isGitHubConfigured(cfg) && (cfg.autoSync || forceGithub);
+
+    if (!shouldSync) {
+      setStatus(
+        fromUser
+          ? isGitHubConfigured(cfg)
+            ? "Saved locally (GitHub auto-sync is off — enable in GitHub settings)"
+            : "Saved locally — click GitHub to connect and push on Save"
+          : "Saved locally"
+      );
+      updateGitHubBadge();
+      return { local: true, github: false };
+    }
+
+    updateGitHubBadge("busy");
+    setStatus("Saving to GitHub…");
+
+    const result = await syncToGitHub(cfg, {
+      library: {
+        activeId: state.library.activeId,
+        projects: state.library.projects,
+      },
+      catalogJson: exportCatalogJson(),
+      activeProject: deepClone(state.project),
+    });
+
+    updateGitHubBadge();
+    const n = result.files?.length || 0;
+    setStatus(
+      `Saved locally + GitHub (${n} file${n === 1 ? "" : "s"} → ${cfg.owner}/${cfg.repo}@${cfg.branch})`
+    );
+    return { local: true, github: true, result };
+  } catch (err) {
+    updateGitHubBadge("err");
+    setStatus("Local save OK — GitHub failed: " + err.message);
+    if (fromUser) {
+      alert(
+        "Saved in this browser, but GitHub push failed:\n\n" +
+          err.message +
+          "\n\nCheck token permissions (Contents: Read and write) and repo name."
+      );
+    }
+    return { local: true, github: false, error: err };
+  } finally {
+    btn?.classList.remove("saving");
+  }
+}
+
 // ── Multi-project library persistence ──
 let persistTimer;
 
@@ -2172,6 +2337,11 @@ function slug(s) {
 // ── Keyboard ──
 function onKeyDown(e) {
   const mod = e.metaKey || e.ctrlKey;
+  if (mod && (e.key === "s" || e.key === "S")) {
+    e.preventDefault();
+    saveAll({ fromUser: true });
+    return;
+  }
   if (mod && e.key === "z" && !e.shiftKey) {
     e.preventDefault();
     undo();
@@ -2253,9 +2423,13 @@ function bindUI() {
   $("#btn-delete-project")?.addEventListener("click", deleteCurrentProject);
   $("#btn-export").addEventListener("click", exportJSON);
   $("#btn-export-csv").addEventListener("click", exportCSV);
+  $("#btn-save")?.addEventListener("click", () => saveAll({ fromUser: true }));
+  $("#btn-github-settings")?.addEventListener("click", openGitHubSettings);
   $("#btn-print").addEventListener("click", () => printToPdf());
   window.addEventListener("beforeprint", preparePrintLayout);
   window.addEventListener("afterprint", restorePrintLayout);
+  bindGitHubSettingsModal();
+  updateGitHubBadge();
   $("#btn-import").addEventListener("click", () => fileImport.click());
   fileImport.addEventListener("change", () => {
     const f = fileImport.files?.[0];
