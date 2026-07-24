@@ -160,8 +160,24 @@ function redo() {
 }
 
 // ── Status / view ──
-function setStatus(msg) {
-  statusMsg.textContent = msg;
+let _statusClearTimer = null;
+function setStatus(msg, kind = "") {
+  const el = statusMsg || document.getElementById("status-msg");
+  if (!el) {
+    console.log("[status]", msg);
+    return;
+  }
+  el.textContent = msg;
+  el.classList.remove("status-ok", "status-warn", "status-err", "status-busy");
+  if (kind) el.classList.add(`status-${kind}`);
+  el.title = msg;
+  // Keep success/warn visible longer so it isn't missed
+  clearTimeout(_statusClearTimer);
+  if (kind === "ok" || kind === "warn") {
+    _statusClearTimer = setTimeout(() => {
+      el.classList.remove("status-ok", "status-warn");
+    }, 8000);
+  }
 }
 
 function setTool(tool) {
@@ -2791,27 +2807,50 @@ function bindGitHubSettingsModal() {
 async function saveAll({ fromUser = false, forceGithub = false } = {}) {
   const btn = $("#btn-save");
   btn?.classList.add("saving");
+  setStatus("Saving locally…", "busy");
+
   try {
-    persistLibraryNow();
+    const localResult = persistLibraryNow();
     state.dirty = false;
+
+    if (!localResult?.ok) {
+      const errMsg = localResult?.error || "localStorage write failed";
+      setStatus("Local save failed: " + errMsg, "err");
+      if (fromUser) {
+        alert(
+          "Could not save in this browser:\n\n" +
+            errMsg +
+            "\n\nStorage may be full or blocked. Try Export JSON as a backup."
+        );
+      }
+      updateGitHubBadge();
+      return { local: false, github: false, error: errMsg };
+    }
+
+    const nProj = localResult.projectCount || 0;
+    const catN = (getCatalogItems() || []).length;
+    const when = new Date().toLocaleTimeString();
+    const localMsg = `Saved locally at ${when} · ${nProj} project(s) · ${catN} catalog · “${localResult.name || "Untitled"}”`;
+
+    // Always show local success first (even if GitHub push follows)
+    setStatus(localMsg, "ok");
 
     const cfg = loadGitHubSettings();
     const shouldSync = isGitHubConfigured(cfg) && (cfg.autoSync || forceGithub);
 
     if (!shouldSync) {
-      setStatus(
-        fromUser
-          ? isGitHubConfigured(cfg)
-            ? "Saved locally (GitHub auto-sync is off — enable in GitHub settings)"
-            : "Saved locally — click GitHub to connect and push on Save"
-          : "Saved locally"
-      );
+      const extra = isGitHubConfigured(cfg)
+        ? " · GitHub auto-push is OFF (enable in GitHub settings)"
+        : cfg.owner && cfg.repo
+          ? " · GH pull-only — add token to push"
+          : " · GitHub not connected";
+      setStatus(localMsg + extra, "ok");
       updateGitHubBadge();
-      return { local: true, github: false };
+      return { local: true, github: false, localResult };
     }
 
     updateGitHubBadge("busy");
-    setStatus("Saving to GitHub…");
+    setStatus(localMsg + " · pushing to GitHub…", "busy");
 
     const result = await syncToGitHub(cfg, {
       library: {
@@ -2825,12 +2864,14 @@ async function saveAll({ fromUser = false, forceGithub = false } = {}) {
     updateGitHubBadge();
     const n = result.files?.length || 0;
     setStatus(
-      `Saved locally + GitHub (${n} file${n === 1 ? "" : "s"} → ${cfg.owner}/${cfg.repo}@${cfg.branch})`
+      `${localMsg} · GitHub OK (${n} file${n === 1 ? "" : "s"} → ${cfg.owner}/${cfg.repo}@${cfg.branch})`,
+      "ok"
     );
-    return { local: true, github: true, result };
+    return { local: true, github: true, result, localResult };
   } catch (err) {
     updateGitHubBadge("err");
-    setStatus("Local save OK — GitHub failed: " + err.message);
+    // Local already succeeded if we got past persist
+    setStatus("Saved locally · GitHub failed: " + err.message, "warn");
     if (fromUser) {
       alert(
         "Saved in this browser, but GitHub push failed:\n\n" +
@@ -2864,24 +2905,39 @@ function saveCurrentProjectNow() {
     state.library.activeId = state.project.id;
     // also keep legacy key in sync for older tools
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.project));
-  } catch {
-    /* quota */
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err?.message || String(err) };
   }
 }
 
 function persistLibraryNow() {
   try {
-    saveCurrentProjectNow();
-    localStorage.setItem(
-      LIBRARY_KEY,
-      JSON.stringify({
-        version: 1,
-        activeId: state.library.activeId,
-        projects: state.library.projects,
-      })
-    );
-  } catch {
-    /* quota */
+    const step = saveCurrentProjectNow();
+    if (step && step.ok === false) return step;
+    const payload = {
+      version: 1,
+      activeId: state.library.activeId,
+      projects: state.library.projects,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(LIBRARY_KEY, JSON.stringify(payload));
+    // Also persist catalog snapshot key so recovery is easier
+    try {
+      const cat = exportCatalogJson();
+      localStorage.setItem("raiv-wire-device-catalog-v1", cat);
+    } catch {
+      /* catalog optional */
+    }
+    return {
+      ok: true,
+      projectCount: Object.keys(state.library.projects || {}).length,
+      name: state.project?.name || "",
+      activeId: state.library.activeId,
+      savedAt: payload.savedAt,
+    };
+  } catch (err) {
+    return { ok: false, error: err?.message || String(err) };
   }
 }
 
