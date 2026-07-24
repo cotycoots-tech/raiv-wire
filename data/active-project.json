@@ -1,13 +1,13 @@
 {
   "type": "raiv-wire-active-project",
   "version": 1,
-  "savedAt": "2026-07-24T20:25:59.883Z",
+  "savedAt": "2026-07-24T20:28:11.930Z",
   "project": {
     "version": 1,
     "id": "proj_mrz5jajb_2",
     "name": "Demo Build",
     "createdAt": "2026-07-24T16:25:47.543Z",
-    "updatedAt": "2026-07-24T20:25:59.882Z",
+    "updatedAt": "2026-07-24T20:28:11.929Z",
     "nodes": [
       {
         "id": "node_mrz5jajb_3",
