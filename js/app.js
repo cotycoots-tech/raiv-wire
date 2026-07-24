@@ -2565,6 +2565,100 @@ function recoverComponentsCatalog() {
   );
 }
 
+/**
+ * Full factory restore from data/factory-recovery.json (repo snapshot)
+ * + built-in seeds. Restores Demo Build project and complete catalog.
+ */
+async function factoryRestoreFromRepo() {
+  if (
+    !confirm(
+      "FACTORY RESTORE\n\nThis will reload known-good data from the app package:\n" +
+        "• Full device catalog (CLICK, Staubli, Fuji, sensors, …)\n" +
+        "• Demo Build project from chat/repo history\n\n" +
+        "Existing projects with different IDs are kept.\n" +
+        "Continue?"
+    )
+  ) {
+    return;
+  }
+
+  updateGitHubBadge("busy");
+  setStatus("Restoring from package recovery bundle…");
+
+  try {
+    // 1) Always restore catalog seeds
+    restoreSeedCatalog();
+
+    // 2) Load recovery JSON shipped with the site
+    const url = `data/factory-recovery.json?t=${Date.now()}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Could not load ${url} (${res.status})`);
+    const bundle = await res.json();
+
+    if (bundle.catalog?.items) {
+      try {
+        importCatalogJson(JSON.stringify(bundle.catalog), "merge");
+      } catch (e) {
+        console.warn(e);
+      }
+      ensureSeedItems(true);
+    }
+
+    if (bundle.projectsLibrary?.projects) {
+      applyRemoteLibrary(bundle.projectsLibrary, { preferRemoteActive: true });
+    } else if (bundle.activeProject?.project) {
+      const p = bundle.activeProject.project;
+      ensureProjectId(p);
+      state.library.projects = state.library.projects || {};
+      state.library.projects[p.id] = deepClone(p);
+      state.library.activeId = p.id;
+      state.project = deepClone(p);
+      persistLibraryNow();
+      refreshProjectSwitcher();
+    }
+
+    // 3) Also try GitHub pull (non-destructive merge)
+    const cfg = loadGitHubSettings();
+    if (canPullFromGitHub(cfg)) {
+      try {
+        await loadFromGitHub({ fromUser: false, quiet: true });
+      } catch {
+        /* ignore */
+      }
+    }
+
+    // 4) Final seed pass
+    ensureSeedItems(true);
+    renderCatalogPalette();
+    refreshProjectSwitcher();
+    render();
+    requestAnimationFrame(() => {
+      setView(fitView(svg, state.project));
+      render();
+    });
+
+    const n = Object.keys(state.library.projects || {}).length;
+    const c = (getCatalogItems() || []).length;
+    updateGitHubBadge();
+    setStatus(`Factory restore complete: ${n} project(s), ${c} catalog devices`);
+    alert(
+      `Restore complete.\n\nProjects: ${n}\nCatalog devices: ${c}\nActive: ${state.project.name}\n\n` +
+        `Click Save to push this recovered state to GitHub so all PCs can Pull it.`
+    );
+  } catch (err) {
+    updateGitHubBadge("err");
+    setStatus("Factory restore failed: " + err.message);
+    // still restore seeds at minimum
+    try {
+      restoreSeedCatalog();
+      renderCatalogPalette();
+    } catch {
+      /* ignore */
+    }
+    alert("Factory restore failed:\n\n" + err.message + "\n\nBuilt-in components were still restored if possible.");
+  }
+}
+
 function bindGitHubSettingsModal() {
   $("#gh-cancel")?.addEventListener("click", () => {
     $("#github-modal")?.classList.add("hidden");
@@ -3105,6 +3199,9 @@ function bindUI() {
     ) {
       recoverComponentsCatalog();
     }
+  });
+  $("#btn-factory-restore")?.addEventListener("click", () => {
+    factoryRestoreFromRepo();
   });
   $("#btn-print").addEventListener("click", () => printToPdf());
   window.addEventListener("beforeprint", preparePrintLayout);

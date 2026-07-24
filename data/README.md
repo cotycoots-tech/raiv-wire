@@ -28,4 +28,22 @@ Always **Save** after editing, then **Pull** (or reopen the app with auto-pull) 
 
 ## Restore
 
+### On the live site (recommended)
+
+1. Hard-refresh the page (`Cmd+Shift+R`).
+2. Click **Factory restore** — reloads `data/factory-recovery.json` (Demo Build + full 19-device catalog).
+3. Or click **Recover components** for catalog only.
+4. Click **Save** (with GitHub connected) so all PCs can **Pull** the recovered data.
+
+### Manual
+
 Use toolbar **Pull**, or **Import** JSON, or copy values from these files into Import / catalog import.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `factory-recovery.json` | Full recovery bundle used by **Factory restore** |
+| `projects-library.json` | Multi-project library |
+| `device-catalog.json` | Device inventory |
+| `active-project.json` | Last active project snapshot |

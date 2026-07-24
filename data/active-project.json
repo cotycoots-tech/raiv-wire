@@ -1,7 +1,7 @@
 {
   "type": "raiv-wire-active-project",
   "version": 1,
-  "savedAt": "2026-07-24T16:32:30.287Z",
+  "savedAt": "2026-07-24T19:56:21.000Z",
   "project": {
     "version": 1,
     "id": "proj_mrz5jajb_2",
@@ -311,7 +311,7 @@
           },
           {
             "id": "TS-",
-            "name": "Therm −",
+            "name": "Therm \u2212",
             "matePin": "",
             "side": ""
           }
