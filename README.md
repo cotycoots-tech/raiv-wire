@@ -4,7 +4,24 @@
 
 Built as a full client-side stack: **HTML · CSS · JavaScript** (ES modules). No build step required.
 
-## Quick start
+## Live site (GitHub Pages)
+
+**https://cotycoots-tech.github.io/raiv-wire/**
+
+Hosted from this repository via GitHub Pages (Actions deploy on every push to `main`).
+
+### Hosting vs storage
+
+| Need | How RAIV Wire handles it |
+|------|---------------------------|
+| **Hosting** | GitHub Pages serves the static app (HTML/CSS/JS) |
+| **Project / catalog storage** | Browser **localStorage** (per user, per browser) |
+| **Sharing projects / catalogs** | Export JSON / Excel / CSV, then import on another machine |
+| **Source control** | This GitHub repo |
+
+GitHub Pages is static hosting only — it does not provide a shared cloud database. Use Export/Import to move work between browsers or teammates.
+
+## Quick start (local)
 
 Open `index.html` in a modern browser, **or** serve the folder (recommended so modules load cleanly):
 
