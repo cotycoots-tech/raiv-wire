@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAIV Wire — Machine Builder Wiring Diagram</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- Print-only title block (hidden on screen) -->
+    <div id="print-sheet" class="print-sheet" aria-hidden="true">
+      <header class="print-header">
+        <div>
+          <div class="print-brand">RAIV Wire</div>
+          <h1 id="print-title">Wiring Diagram</h1>
+        </div>
+        <div class="print-meta">
+          <div><span>Drawing</span> <strong id="print-drawing">WD-001</strong></div>
+          <div><span>Rev</span> <strong id="print-rev">A</strong></div>
+          <div><span>Date</span> <strong id="print-date"></strong></div>
+          <div><span>Cables</span> <strong id="print-cable-count">0</strong></div>
+        </div>
+      </header>
+    </div>
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">RW</span>
+        <div class="brand-text">
+          <strong>RAIV Wire</strong>
+          <span>Machine Builder Wiring Diagram</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tool-group">
+          <button type="button" id="btn-select" class="tool active" title="Select (V)" data-tool="select">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M4 3l12 9-5 1 3 7-2 1-3-7-5 4z"/></svg>
+          </button>
+          <button type="button" id="btn-pan" class="tool" title="Pan (H)" data-tool="pan">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M9 11V5a1 1 0 012 0v6h2V3a1 1 0 012 0v8h2V6a1 1 0 012 0v10l-4 5H9l-4-5V9a1 1 0 012 0v2h2z"/></svg>
+          </button>
+          <button type="button" id="btn-cable" class="tool" title="Draw cable (C)" data-tool="cable">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M4 14h2v2H4v-2zm4-4h2v6H8v-6zm4-4h2v10h-2V6zm4 2h2v8h-2V8zm4 3h2v5h-2v-5z"/></svg>
+          </button>
+        </div>
+        <div class="tool-group">
+          <button type="button" id="btn-zoom-in" class="tool" title="Zoom in">+</button>
+          <button type="button" id="btn-zoom-out" class="tool" title="Zoom out">−</button>
+          <button type="button" id="btn-zoom-fit" class="tool" title="Fit view">Fit</button>
+          <span id="zoom-label" class="zoom-label">100%</span>
+        </div>
+        <div class="tool-group">
+          <button type="button" id="btn-undo" class="tool" title="Undo (Ctrl+Z)">Undo</button>
+          <button type="button" id="btn-redo" class="tool" title="Redo (Ctrl+Y)">Redo</button>
+          <button type="button" id="btn-delete" class="tool danger" title="Delete (Del)">Del</button>
+        </div>
+        <div class="tool-group">
+          <button type="button" id="btn-new" class="tool" title="New project">New</button>
+          <button type="button" id="btn-import" class="tool" title="Import JSON">Import</button>
+          <button type="button" id="btn-export" class="tool" title="Export JSON">Export</button>
+          <button type="button" id="btn-print" class="tool primary" title="Print / PDF">Print</button>
+        </div>
+      </div>
+
+      <div class="project-meta">
+        <input type="text" id="project-name" value="Untitled Machine" placeholder="Project name" />
+        <span id="status-msg" class="status-msg">Ready</span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <!-- Left palette -->
+      <aside class="palette panel">
+        <h2>Components</h2>
+        <p class="hint">Click a type, then click the canvas to place.</p>
+
+        <section class="palette-section">
+          <h3>Device catalog</h3>
+          <p class="hint" style="margin-bottom:8px">Inventory stock — place pre-configured devices. Save any device from Properties.</p>
+          <div class="catalog-toolbar">
+            <input type="search" id="catalog-search" placeholder="Search catalog…" />
+            <div class="catalog-toolbar-btns">
+              <button type="button" id="btn-catalog-export" class="btn-tiny" title="Export catalog JSON">Export</button>
+              <button type="button" id="btn-catalog-import" class="btn-tiny" title="Import catalog JSON">Import</button>
+              <button type="button" id="btn-catalog-reset" class="btn-tiny" title="Restore starter catalog">Reset</button>
+            </div>
+          </div>
+          <div id="palette-catalog" class="catalog-groups"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Devices (generic)</h3>
+          <p class="hint" style="margin-bottom:8px">Blank templates — configure terminals then Save to catalog.</p>
+          <div class="palette-grid" id="palette-devices"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Enclosures</h3>
+          <div class="palette-grid" id="palette-enclosures"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Terminals</h3>
+          <div class="palette-grid" id="palette-terminals"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Bulkhead / panel</h3>
+          <p class="hint" style="margin-bottom:8px">Drag onto canvas or click then place. Field (F) left · Panel (P) right — mate terminated cordsets here.</p>
+          <div class="palette-grid" id="palette-connectors"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Wire colors</h3>
+          <div class="color-swatches" id="color-swatches"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Cables (open / bulk)</h3>
+          <div class="cable-templates" id="cable-templates"></div>
+        </section>
+
+        <section class="palette-section">
+          <h3>Cables (terminated)</h3>
+          <p class="hint" style="margin-bottom:8px">Factory cordsets by subcategory. Expand a group, then pick a cordset.</p>
+          <div class="cable-terminated-groups" id="cable-templates-terminated"></div>
+        </section>
+      </aside>
+
+      <!-- Canvas -->
+      <main class="canvas-wrap">
+        <div id="canvas-container">
+          <svg id="diagram" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(148,163,184,0.12)" stroke-width="1"/>
+              </pattern>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+              </marker>
+              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.35"/>
+              </filter>
+            </defs>
+            <g id="viewport">
+              <rect id="grid-bg" x="-5000" y="-5000" width="10000" height="10000" fill="url(#grid)"/>
+              <g id="layer-cables"></g>
+              <g id="layer-nodes"></g>
+              <g id="layer-overlay"></g>
+            </g>
+          </svg>
+          <div id="cable-preview" class="cable-preview hidden"></div>
+        </div>
+
+        <div class="canvas-footer">
+          <div class="legend">
+            <span class="legend-item"><i class="dot device"></i> Device</span>
+            <span class="legend-item"><i class="dot jbox"></i> Junction box</span>
+            <span class="legend-item"><i class="dot terminal"></i> Terminal strip</span>
+            <span class="legend-item"><i class="dot connector"></i> Connector</span>
+            <span class="legend-item"><i class="dot cable"></i> Cable</span>
+          </div>
+          <div id="cursor-pos" class="cursor-pos">0, 0</div>
+        </div>
+      </main>
+
+      <!-- Right properties -->
+      <aside class="props panel">
+        <h2>Properties</h2>
+        <div id="props-empty" class="props-empty">
+          Select a device, junction box, terminal strip, or cable to edit its landings and details.
+        </div>
+        <div id="props-form" class="props-form hidden"></div>
+
+        <div class="props-divider"></div>
+
+        <h2>Wire &amp; cable list</h2>
+        <div class="table-wrap">
+          <table id="wire-table">
+            <thead>
+              <tr>
+                <th>Cable</th>
+                <th>Cond.</th>
+                <th>Color</th>
+                <th>From</th>
+                <th>To</th>
+                <th>AWG</th>
+                <th>Ends</th>
+              </tr>
+            </thead>
+            <tbody id="wire-table-body">
+              <tr class="empty-row"><td colspan="7">No cables yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bom-actions">
+          <button type="button" id="btn-export-csv" class="btn-secondary">Export wire list CSV</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Print-only wire list (filled before print) -->
+    <section id="print-wire-list" class="print-wire-list" aria-hidden="true">
+      <h2>Wire &amp; cable list</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Cable</th>
+            <th>Terminated</th>
+            <th>End A</th>
+            <th>End B</th>
+            <th>Cond.</th>
+            <th>Color</th>
+            <th>From</th>
+            <th>To</th>
+            <th>AWG</th>
+            <th>Length</th>
+          </tr>
+        </thead>
+        <tbody id="print-wire-body"></tbody>
+      </table>
+    </section>
+
+    <!-- Bottom sheet: device landings detail -->
+    <footer class="landing-bar panel">
+      <div class="landing-bar-header">
+        <h2>Terminal landings</h2>
+        <span id="landing-context" class="muted">Select a node to view terminal map</span>
+      </div>
+      <div id="landing-map" class="landing-map">
+        <div class="landing-placeholder">Place devices and junction boxes, then draw cables between terminals.</div>
+      </div>
+    </footer>
+  </div>
+
+  <input type="file" id="file-import" accept="application/json,.json" hidden />
+  <input type="file" id="file-catalog-import" accept="application/json,.json" hidden />
+
+  <!-- Modal: save to device catalog -->
+  <div id="catalog-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3>Save to device catalog</h3>
+      <p class="hint" style="margin-top:0">Stores terminals, manufacturer, and part number for reuse.</p>
+      <div class="field">
+        <label>Catalog name (inventory title)</label>
+        <input type="text" id="cat-modal-name" placeholder="e.g. Banner QS18 photoeye" />
+      </div>
+      <div class="field">
+        <label>Inventory group</label>
+        <select id="cat-modal-group"></select>
+      </div>
+      <div class="field">
+        <label>Tag prefix</label>
+        <input type="text" id="cat-modal-prefix" placeholder="e.g. B, PLC, VFD" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="cat-modal-cancel" class="btn-secondary">Cancel</button>
+        <button type="button" id="cat-modal-save" class="btn-primary">Save to catalog</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: new cable conductors -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <h3 id="modal-title">Cable conductors</h3>
+      <div id="modal-body"></div>
+      <div class="modal-actions">
+        <button type="button" id="modal-cancel" class="btn-secondary">Cancel</button>
+        <button type="button" id="modal-ok" class="btn-primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
