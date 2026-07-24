@@ -146,6 +146,82 @@ export function defaultCatalogItems() {
       ],
     },
     {
+      id: "seed_staubli_d244030_ecat",
+      catalogName: "Staubli D244030 EtherCAT 8DI+4DO",
+      inventoryGroup: "io",
+      baseType: "plc",
+      tagPrefix: "EC",
+      name: "EtherCAT coupler 8DI+4DO",
+      manufacturer: "Stäubli",
+      partNumber: "D 244 030 00",
+      seedRevision: 2,
+      description:
+        "EtherCAT coupler 8 DI + 4 DO (D 244 030 00), equivalent to Beckhoff EK1818. S/N 50220013. Terminal points 1–16 per Stäubli wiring diagram.",
+      width: 150,
+      height: 130,
+      terminals: [
+        // EtherCAT ports (front)
+        { id: "EC-IN", name: "Link/Act In EtherCAT" },
+        { id: "EC-OUT", name: "Link/Act Out EtherCAT" },
+        // Terminal strip — Name / No. from datasheet §6.1.2
+        { id: "1", name: "Us +24 V (bus coupler / E-bus)" },
+        { id: "2", name: "Input 1" },
+        { id: "3", name: "Input 3" },
+        { id: "4", name: "Input 5" },
+        { id: "5", name: "Input 7" },
+        { id: "6", name: "Up +24 V (power contacts)" },
+        { id: "7", name: "Output 1" },
+        { id: "8", name: "Output 3" },
+        { id: "9", name: "Us 0 V (bus coupler / E-bus)" },
+        { id: "10", name: "Input 2" },
+        { id: "11", name: "Input 4" },
+        { id: "12", name: "Input 6" },
+        { id: "13", name: "Input 8" },
+        { id: "14", name: "Up 0 V (power contacts)" },
+        { id: "15", name: "Output 2" },
+        { id: "16", name: "Output 4" },
+        { id: "SN", name: "S/N 50220013" },
+      ],
+    },
+    {
+      id: "seed_staubli_d244031_ecat",
+      catalogName: "Staubli D244031 EtherCAT 8DI/8DO",
+      inventoryGroup: "io",
+      baseType: "plc",
+      tagPrefix: "EC",
+      name: "EtherCAT digital 8 DI/DO",
+      manufacturer: "Stäubli",
+      partNumber: "D 244 031 00",
+      seedRevision: 2,
+      description:
+        "Module EtherCAT digital 8 DI/DO (D 244 031 00), equivalent to Beckhoff EL1859. S/N 15240008. Terminal points 1–16 per Stäubli wiring diagram §6.2.2.",
+      width: 140,
+      height: 130,
+      terminals: [
+        // Power contacts (from top-view wiring diagram)
+        { id: "PC+24", name: "Power contact +24 V" },
+        { id: "PC0V", name: "Power contact 0 V" },
+        // Terminal strip — Name / No. from datasheet §6.2.2
+        { id: "1", name: "Input 1" },
+        { id: "2", name: "Input 2" },
+        { id: "3", name: "Input 3" },
+        { id: "4", name: "Input 4" },
+        { id: "5", name: "Input 5" },
+        { id: "6", name: "Input 6" },
+        { id: "7", name: "Input 7" },
+        { id: "8", name: "Input 8" },
+        { id: "9", name: "Output 1" },
+        { id: "10", name: "Output 2" },
+        { id: "11", name: "Output 3" },
+        { id: "12", name: "Output 4" },
+        { id: "13", name: "Output 5" },
+        { id: "14", name: "Output 6" },
+        { id: "15", name: "Output 7" },
+        { id: "16", name: "Output 8" },
+        { id: "SN", name: "S/N 15240008" },
+      ],
+    },
+    {
       id: "seed_vfd_pf525",
       catalogName: "PowerFlex 525",
       inventoryGroup: "drives",
@@ -447,13 +523,24 @@ export function loadCatalog() {
   return _items;
 }
 
-/** Add any new built-in seed items missing from an existing catalog (by id). */
+/**
+ * Add missing built-in seeds, and refresh seeds when seedRevision increases
+ * (so datasheet corrections propagate without a full catalog Reset).
+ */
 function ensureSeedItems() {
   if (!_items) return;
   let changed = false;
   for (const seed of defaultCatalogItems()) {
-    if (!_items.some((i) => i.id === seed.id)) {
+    const idx = _items.findIndex((i) => i.id === seed.id);
+    if (idx < 0) {
       _items.push(deepClone(seed));
+      changed = true;
+      continue;
+    }
+    const curRev = Number(_items[idx].seedRevision) || 0;
+    const nextRev = Number(seed.seedRevision) || 0;
+    if (nextRev > curRev) {
+      _items[idx] = deepClone(seed);
       changed = true;
     }
   }
