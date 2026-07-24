@@ -48,8 +48,11 @@ import {
   exportCatalogCsv,
   importCatalogFile,
   resetCatalogToDefaults,
+  restoreSeedCatalog,
+  ensureSeedItems,
   INVENTORY_GROUPS,
   loadCatalog,
+  getCatalogItems,
 } from "./catalog.js";
 
 import {
@@ -2368,8 +2371,17 @@ function readGitHubForm() {
 
 function applyRemoteLibrary(remoteLib, { preferRemoteActive = true } = {}) {
   if (!remoteLib?.projects || typeof remoteLib.projects !== "object") {
-    return { projectCount: 0 };
+    return { projectCount: Object.keys(state.library.projects || {}).length, skipped: true };
   }
+  const remoteCount = Object.keys(remoteLib.projects).length;
+  const localCount = Object.keys(state.library.projects || {}).length;
+
+  // Never apply an empty remote library over local work
+  if (remoteCount === 0 && localCount > 0) {
+    console.warn("Skipping empty remote project library");
+    return { projectCount: localCount, skipped: true };
+  }
+
   const merged = mergeProjectLibraries(
     {
       activeId: state.library.activeId,
@@ -2378,6 +2390,16 @@ function applyRemoteLibrary(remoteLib, { preferRemoteActive = true } = {}) {
     },
     remoteLib
   );
+
+  // Safety: never end up with zero projects if we had local data
+  if (
+    Object.keys(merged.projects || {}).length === 0 &&
+    localCount > 0
+  ) {
+    console.warn("Merge produced empty library — keeping local");
+    return { projectCount: localCount, skipped: true };
+  }
+
   state.library.projects = merged.projects;
   state.library.activeId = preferRemoteActive
     ? merged.activeId
@@ -2409,11 +2431,12 @@ function applyRemoteLibrary(remoteLib, { preferRemoteActive = true } = {}) {
   state.dirty = false;
   persistLibraryNow();
   refreshProjectSwitcher();
-  return { projectCount: Object.keys(state.library.projects).length };
+  return { projectCount: Object.keys(state.library.projects).length, skipped: false };
 }
 
 /**
  * Download projects + catalog from GitHub and merge into this browser.
+ * Never wipes local projects/catalog if remote is empty or invalid.
  */
 async function loadFromGitHub({ fromUser = false, quiet = false } = {}) {
   const cfg = loadGitHubSettings();
@@ -2425,24 +2448,78 @@ async function loadFromGitHub({ fromUser = false, quiet = false } = {}) {
     return { ok: false };
   }
 
+  // Snapshot local state for recovery
+  const localSnap = {
+    library: deepClone(state.library),
+    project: deepClone(state.project),
+  };
+  const localProjectCount = Object.keys(state.library.projects || {}).length;
+
   updateGitHubBadge("busy");
   if (!quiet) setStatus("Pulling projects from GitHub…");
 
   try {
     const remote = await pullFromGitHub(cfg);
-    let projectCount = 0;
-    if (remote.projects) {
+    let projectCount = localProjectCount;
+
+    if (remote.projects?.projects && typeof remote.projects.projects === "object") {
       const r = applyRemoteLibrary(remote.projects, { preferRemoteActive: true });
       projectCount = r.projectCount;
+    } else if (remote.projects && remote.projects.type === "raiv-wire-projects-library") {
+      const r = applyRemoteLibrary(remote.projects, { preferRemoteActive: true });
+      projectCount = r.projectCount;
+    } else if (remote.active?.project) {
+      // Fallback: only active-project.json available
+      const p = remote.active.project;
+      ensureProjectId(p);
+      if (!state.library.projects) state.library.projects = {};
+      const existing = state.library.projects[p.id];
+      if (
+        !existing ||
+        (p.updatedAt || "") >= (existing.updatedAt || "")
+      ) {
+        state.library.projects[p.id] = deepClone(p);
+        state.library.activeId = p.id;
+        state.project = deepClone(p);
+        persistLibraryNow();
+        refreshProjectSwitcher();
+      }
+      projectCount = Object.keys(state.library.projects).length;
     }
+
+    // Catalog: merge then force-restore built-in components
     if (remote.catalog) {
       try {
         importCatalogJson(JSON.stringify(remote.catalog), "merge");
-        loadCatalog();
-        renderCatalogPalette();
       } catch (err) {
         console.warn("Catalog pull merge failed", err);
       }
+    }
+    try {
+      ensureSeedItems(true);
+      loadCatalog();
+      renderCatalogPalette();
+    } catch (err) {
+      console.warn("Seed restore failed", err);
+      try {
+        restoreSeedCatalog();
+        renderCatalogPalette();
+      } catch {
+        /* ignore */
+      }
+    }
+
+    // Final safety: if we wiped projects, restore snapshot
+    if (
+      Object.keys(state.library.projects || {}).length === 0 &&
+      localProjectCount > 0
+    ) {
+      state.library = localSnap.library;
+      state.project = localSnap.project;
+      persistLibraryNow();
+      refreshProjectSwitcher();
+      projectCount = localProjectCount;
+      setStatus("Pull skipped empty remote — kept your local projects");
     }
 
     updateGitHubBadge();
@@ -2452,26 +2529,40 @@ async function loadFromGitHub({ fromUser = false, quiet = false } = {}) {
       render();
     });
 
-    const msg = `Pulled from GitHub: ${projectCount} project${projectCount === 1 ? "" : "s"}${
-      remote.catalog ? " + catalog" : ""
-    } → ${cfg.owner}/${cfg.repo}`;
+    const catCount = (getCatalogItems() || []).length;
+    const msg = `Pulled from GitHub: ${projectCount} project${projectCount === 1 ? "" : "s"}, ${catCount} catalog items → ${cfg.owner}/${cfg.repo}`;
     setStatus(msg);
-    if (fromUser && !quiet) {
-      // lightweight confirm of success
-    }
-    return { ok: true, projectCount, remote };
+    return { ok: true, projectCount, catCount, remote };
   } catch (err) {
+    // Restore snapshot on hard failure
+    if (localProjectCount > 0) {
+      state.library = localSnap.library;
+      state.project = localSnap.project;
+      persistLibraryNow();
+    }
     updateGitHubBadge("err");
     setStatus("GitHub pull failed: " + err.message);
     if (fromUser) {
       alert(
         "Could not pull from GitHub:\n\n" +
           err.message +
-          "\n\nTip: Click Save on a machine that has your work first, so data/projects-library.json exists on the repo."
+          "\n\nYour local data was kept. Tip: Save from a machine that has your work, or use Recover components."
       );
     }
     return { ok: false, error: err };
   }
+}
+
+/** Emergency: restore built-in device catalog seeds */
+function recoverComponentsCatalog() {
+  restoreSeedCatalog();
+  renderCatalogPalette();
+  setStatus(
+    `Device catalog restored: ${getCatalogItems().length} components (built-in seeds + your custom items)`
+  );
+  alert(
+    `Components catalog restored.\n\n${getCatalogItems().length} devices available in Device catalog.\n\nClick Save to push the full catalog back to GitHub.`
+  );
 }
 
 function bindGitHubSettingsModal() {
@@ -3006,6 +3097,15 @@ function bindUI() {
   $("#btn-save")?.addEventListener("click", () => saveAll({ fromUser: true }));
   $("#btn-github-settings")?.addEventListener("click", openGitHubSettings);
   $("#btn-github-pull")?.addEventListener("click", () => loadFromGitHub({ fromUser: true }));
+  $("#btn-recover-catalog")?.addEventListener("click", () => {
+    if (
+      confirm(
+        "Restore all built-in device catalog components (CLICK PLC, Staubli, Fuji, sensors, etc.)?\n\nYour custom catalog items are kept. Then click Save to update GitHub."
+      )
+    ) {
+      recoverComponentsCatalog();
+    }
+  });
   $("#btn-print").addEventListener("click", () => printToPdf());
   window.addEventListener("beforeprint", preparePrintLayout);
   window.addEventListener("afterprint", restorePrintLayout);
@@ -3103,20 +3203,50 @@ async function init() {
     persistLibraryNow();
   } else {
     ensureProjectId(state.project);
-    if (!state.library.projects[state.project.id]) {
+    if (!state.library.projects) state.library.projects = {};
+    if (!state.library.projects[state.project.id] && state.project.nodes?.length) {
       state.library.projects[state.project.id] = deepClone(state.project);
       state.library.activeId = state.project.id;
       persistLibraryNow();
     }
   }
+
+  // Always ensure built-in components exist (never leave empty catalog)
+  try {
+    loadCatalog();
+    ensureSeedItems(true);
+    renderCatalogPalette();
+  } catch (err) {
+    console.warn(err);
+    try {
+      restoreSeedCatalog();
+      renderCatalogPalette();
+    } catch {
+      /* ignore */
+    }
+  }
+
   refreshProjectSwitcher();
   setTool("select");
   render();
 
-  // Pull remote projects so GitHub is source of truth across browsers
+  // Pull remote — merge only, never wipe local
   const cfg = loadGitHubSettings();
   if (cfg.autoPull !== false && canPullFromGitHub(cfg)) {
     await loadFromGitHub({ fromUser: false, quiet: true });
+  }
+
+  // If still no projects after pull, seed demo so UI is never empty
+  if (!Object.keys(state.library.projects || {}).length) {
+    state.project = createEmptyProject("Demo Packer Line");
+    seedDemo();
+    ensureProjectId(state.project);
+    state.library = {
+      activeId: state.project.id,
+      projects: { [state.project.id]: deepClone(state.project) },
+    };
+    persistLibraryNow();
+    refreshProjectSwitcher();
   }
 
   // fit after layout
@@ -3125,13 +3255,14 @@ async function init() {
       viewportEl,
       state.project.view || { x: 0, y: 0, scale: 1 }
     );
-    if (!loaded && !canPullFromGitHub(cfg)) {
+    if (!loaded) {
       setView(fitView(svg, state.project));
     }
     render();
     const n = Object.keys(state.library.projects).length;
+    const c = (getCatalogItems() || []).length;
     setStatus(
-      `Ready: ${state.project.name} (${n} project${n === 1 ? "" : "s"}). Use Save to push · Pull to download from GitHub.`
+      `Ready: ${state.project.name} · ${n} project(s) · ${c} catalog devices. Save=push · Pull=download · Recover components if catalog empty.`
     );
   });
 

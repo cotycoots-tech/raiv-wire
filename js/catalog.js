@@ -524,11 +524,14 @@ export function loadCatalog() {
 }
 
 /**
- * Add missing built-in seeds, and refresh seeds when seedRevision increases
- * (so datasheet corrections propagate without a full catalog Reset).
+ * Ensure built-in seed devices exist in the catalog.
+ * - Always inserts missing seeds
+ * - Updates seeds when seedRevision increases
+ * - forceRefresh=true overwrites all seed_* entries from code defaults
+ *   (user-added custom items without seed_ ids are never removed)
  */
-function ensureSeedItems() {
-  if (!_items) return;
+export function ensureSeedItems(forceRefresh = false) {
+  if (!_items) _items = [];
   let changed = false;
   for (const seed of defaultCatalogItems()) {
     const idx = _items.findIndex((i) => i.id === seed.id);
@@ -539,12 +542,26 @@ function ensureSeedItems() {
     }
     const curRev = Number(_items[idx].seedRevision) || 0;
     const nextRev = Number(seed.seedRevision) || 0;
-    if (nextRev > curRev) {
+    if (forceRefresh || nextRev > curRev) {
       _items[idx] = deepClone(seed);
       changed = true;
     }
   }
   if (changed) saveCatalog();
+  return _items;
+}
+
+/** Reset catalog to full built-in seed list (keeps non-seed custom items). */
+export function restoreSeedCatalog() {
+  getCatalogItems();
+  ensureSeedItems(true);
+  // Also add any seeds that somehow still missing
+  const seedIds = new Set(defaultCatalogItems().map((s) => s.id));
+  // Keep custom (non-seed) items
+  const custom = _items.filter((i) => !String(i.id || "").startsWith("seed_"));
+  _items = [...defaultCatalogItems().map(deepClone), ...custom];
+  saveCatalog();
+  return _items;
 }
 
 export function getCatalogItems() {
@@ -685,13 +702,17 @@ export function importCatalogJson(text, mode = "merge") {
   const data = JSON.parse(text);
   const incoming = data.items || data;
   if (!Array.isArray(incoming)) throw new Error("Invalid catalog file");
-  return mergeCatalogItems(incoming, mode);
+  const result = mergeCatalogItems(incoming, mode);
+  // Always re-apply built-in seeds after import so devices never "disappear"
+  ensureSeedItems(true);
+  return result;
 }
 
 /** Merge or replace catalog with normalized raw items */
 export function mergeCatalogItems(incoming, mode = "merge") {
   if (!Array.isArray(incoming)) throw new Error("Invalid catalog items");
   if (mode === "replace") {
+    // Replace base list, then seeds are restored by caller via ensureSeedItems
     replaceCatalog(incoming.map(normalizeItem));
   } else {
     getCatalogItems();
@@ -706,6 +727,19 @@ export function mergeCatalogItems(incoming, mode = "merge") {
             i.catalogName === item.catalogName)
       );
       if (existing) {
+        // Do not let an older remote seed wipe a newer local seed revision
+        const isSeed = String(existing.id || "").startsWith("seed_");
+        if (isSeed) {
+          const curRev = Number(existing.seedRevision) || 0;
+          const nextRev = Number(item.seedRevision) || 0;
+          if (nextRev < curRev) continue;
+          if (
+            nextRev === curRev &&
+            (existing.terminals || []).length > (item.terminals || []).length
+          ) {
+            continue;
+          }
+        }
         Object.assign(existing, item, { id: existing.id });
       } else {
         if (_items.some((i) => i.id === item.id)) item.id = uid("cat");
