@@ -26,7 +26,7 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   --font: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
-  --topbar-h: 56px;
+  --topbar-h: auto; /* grows with two rows — never clip tools */
   --landing-h: 48px; /* collapsed default; expanded via #app classes */
   --landing-h-mid: min(42vh, 440px);
   --landing-h-tall: min(72vh, 720px);
@@ -68,27 +68,56 @@ button {
 
 #app {
   display: grid;
-  grid-template-rows: var(--topbar-h) 1fr var(--landing-h);
+  grid-template-rows: auto 1fr var(--landing-h);
   height: 100vh;
   min-height: 0;
+  overflow: hidden;
 }
 
 /* ── Top bar ── */
 .topbar {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 14px;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
   background: linear-gradient(180deg, #152033 0%, var(--bg-panel) 100%);
   border-bottom: 1px solid var(--border);
   z-index: 20;
+  flex-shrink: 0;
+  min-height: 0;
+  /* Never clip Fit / toolbar controls */
+  overflow: visible;
+}
+
+.topbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.topbar-row-main {
+  border-bottom: 1px solid rgba(42, 54, 74, 0.6);
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.topbar-row-actions {
+  flex-wrap: wrap;
+  row-gap: 6px;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 200px;
+  min-width: 0;
+  flex-shrink: 0;
 }
 
 .brand-mark {
@@ -124,32 +153,44 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  flex: 1;
+  gap: 6px;
+  min-width: 0;
+}
+
+.toolbar-canvas {
+  flex: 1 1 auto;
+}
+
+.toolbar-actions {
+  flex: 1 1 auto;
 }
 
 .tool-group {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 2px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  flex-shrink: 0;
 }
 
 .tool {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 30px;
-  padding: 0 10px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tool:hover {
@@ -179,7 +220,7 @@ button {
 }
 
 .zoom-label {
-  min-width: 48px;
+  min-width: 40px;
   text-align: center;
   font-family: var(--mono);
   font-size: 11px;
@@ -193,6 +234,8 @@ button {
   gap: 8px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .project-switcher-wrap {
@@ -215,8 +258,8 @@ button {
 }
 
 #project-switcher {
-  min-width: 160px;
-  max-width: 220px;
+  min-width: 120px;
+  max-width: 180px;
   padding: 5px 8px;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
@@ -239,8 +282,9 @@ button {
 }
 
 #project-name {
-  width: 160px;
-  padding: 6px 10px;
+  width: 140px;
+  max-width: 28vw;
+  padding: 5px 8px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -256,8 +300,9 @@ button {
 .status-msg {
   font-size: 11px;
   color: var(--text-dim);
-  min-width: 120px;
-  max-width: min(420px, 36vw);
+  min-width: 100px;
+  max-width: min(360px, 40vw);
+  flex: 0 1 auto;
   text-align: right;
   white-space: nowrap;
   overflow: hidden;
@@ -265,6 +310,40 @@ button {
   padding: 4px 8px;
   border-radius: 6px;
   transition: background 0.15s, color 0.15s;
+  margin-left: auto;
+}
+
+@media (max-width: 1100px) {
+  .brand-text span {
+    display: none;
+  }
+
+  .brand {
+    min-width: auto;
+  }
+
+  #project-name {
+    width: 110px;
+  }
+
+  #project-switcher {
+    min-width: 100px;
+    max-width: 140px;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar-row-main,
+  .topbar-row-actions {
+    padding: 6px 8px;
+  }
+
+  .status-msg {
+    max-width: 100%;
+    width: 100%;
+    text-align: left;
+    order: 10;
+  }
 }
 
 .status-msg.status-ok {

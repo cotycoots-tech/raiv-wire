@@ -27,63 +27,76 @@
       </header>
     </div>
 
-    <!-- Top bar -->
+    <!-- Top bar: two rows so nothing is clipped -->
     <header class="topbar">
-      <div class="brand">
-        <span class="brand-mark">RW</span>
-        <div class="brand-text">
-          <strong>RAIV Wire</strong>
-          <span>Machine Builder Wiring Diagram</span>
+      <div class="topbar-row topbar-row-main">
+        <div class="brand">
+          <span class="brand-mark">RW</span>
+          <div class="brand-text">
+            <strong>RAIV Wire</strong>
+            <span>Machine Builder Wiring Diagram</span>
+          </div>
+        </div>
+
+        <div class="toolbar toolbar-canvas">
+          <div class="tool-group" title="Canvas tools">
+            <button type="button" id="btn-select" class="tool active" title="Select (V)" data-tool="select">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M4 3l12 9-5 1 3 7-2 1-3-7-5 4z"/></svg>
+            </button>
+            <button type="button" id="btn-pan" class="tool" title="Pan (H)" data-tool="pan">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 11V5a1 1 0 012 0v6h2V3a1 1 0 012 0v8h2V6a1 1 0 012 0v10l-4 5H9l-4-5V9a1 1 0 012 0v2h2z"/></svg>
+            </button>
+            <button type="button" id="btn-cable" class="tool" title="Draw cable (C)" data-tool="cable">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M4 14h2v2H4v-2zm4-4h2v6H8v-6zm4-4h2v10h-2V6zm4 2h2v8h-2V8zm4 3h2v5h-2v-5z"/></svg>
+            </button>
+          </div>
+          <div class="tool-group" title="Zoom">
+            <button type="button" id="btn-zoom-in" class="tool" title="Zoom in">+</button>
+            <button type="button" id="btn-zoom-out" class="tool" title="Zoom out">−</button>
+            <button type="button" id="btn-zoom-fit" class="tool" title="Fit all devices in view">Fit</button>
+            <span id="zoom-label" class="zoom-label">100%</span>
+          </div>
+          <div class="tool-group" title="Edit">
+            <button type="button" id="btn-undo" class="tool" title="Undo (Ctrl+Z)">Undo</button>
+            <button type="button" id="btn-redo" class="tool" title="Redo (Ctrl+Y)">Redo</button>
+            <button type="button" id="btn-delete" class="tool danger" title="Delete (Del)">Del</button>
+          </div>
+        </div>
+
+        <div class="project-meta">
+          <label class="project-switcher-wrap" title="Switch between saved projects">
+            <span class="project-switcher-label">Project</span>
+            <select id="project-switcher" aria-label="Switch project"></select>
+          </label>
+          <input type="text" id="project-name" value="Untitled Machine" placeholder="Project name" />
+          <span id="github-sync-badge" class="github-sync-badge off" title="GitHub sync status">GH · off</span>
         </div>
       </div>
 
-      <div class="toolbar">
-        <div class="tool-group">
-          <button type="button" id="btn-select" class="tool active" title="Select (V)" data-tool="select">
-            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M4 3l12 9-5 1 3 7-2 1-3-7-5 4z"/></svg>
-          </button>
-          <button type="button" id="btn-pan" class="tool" title="Pan (H)" data-tool="pan">
-            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M9 11V5a1 1 0 012 0v6h2V3a1 1 0 012 0v8h2V6a1 1 0 012 0v10l-4 5H9l-4-5V9a1 1 0 012 0v2h2z"/></svg>
-          </button>
-          <button type="button" id="btn-cable" class="tool" title="Draw cable (C)" data-tool="cable">
-            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M4 14h2v2H4v-2zm4-4h2v6H8v-6zm4-4h2v10h-2V6zm4 2h2v8h-2V8zm4 3h2v5h-2v-5z"/></svg>
-          </button>
+      <div class="topbar-row topbar-row-actions">
+        <div class="toolbar toolbar-actions">
+          <div class="tool-group">
+            <button type="button" id="btn-new" class="tool" title="New project">New</button>
+            <button type="button" id="btn-duplicate-project" class="tool" title="Duplicate current project">Dup</button>
+            <button type="button" id="btn-delete-project" class="tool danger" title="Delete current project">Del proj</button>
+            <button type="button" id="btn-import" class="tool" title="Import JSON">Import</button>
+            <button type="button" id="btn-export" class="tool" title="Export JSON">Export</button>
+          </div>
+          <div class="tool-group">
+            <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save/Load sync">GitHub</button>
+            <button type="button" id="btn-github-pull" class="tool" title="Pull projects & catalog from GitHub">Pull</button>
+            <button type="button" id="btn-save" class="tool primary" title="Save locally and push to GitHub (if connected)">Save</button>
+          </div>
+          <div class="tool-group">
+            <button type="button" id="btn-recover-catalog" class="tool" title="Restore built-in device catalog components">Recover</button>
+            <button type="button" id="btn-factory-restore" class="tool primary" title="Restore Demo Build project + full catalog from package" onclick="window.factoryRestoreFromRepo && window.factoryRestoreFromRepo()">Factory restore</button>
+          </div>
+          <div class="tool-group">
+            <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
+            <button type="button" id="btn-wirelist" class="tool" title="Wire & cable list panel (W)" data-tool-panel="wirelist">Wire list</button>
+            <button type="button" id="btn-print" class="tool" title="Print / PDF">Print</button>
+          </div>
         </div>
-        <div class="tool-group">
-          <button type="button" id="btn-zoom-in" class="tool" title="Zoom in">+</button>
-          <button type="button" id="btn-zoom-out" class="tool" title="Zoom out">−</button>
-          <button type="button" id="btn-zoom-fit" class="tool" title="Fit view">Fit</button>
-          <span id="zoom-label" class="zoom-label">100%</span>
-        </div>
-        <div class="tool-group">
-          <button type="button" id="btn-undo" class="tool" title="Undo (Ctrl+Z)">Undo</button>
-          <button type="button" id="btn-redo" class="tool" title="Redo (Ctrl+Y)">Redo</button>
-          <button type="button" id="btn-delete" class="tool danger" title="Delete (Del)">Del</button>
-        </div>
-        <div class="tool-group">
-          <button type="button" id="btn-new" class="tool" title="New project">New</button>
-          <button type="button" id="btn-duplicate-project" class="tool" title="Duplicate current project">Dup</button>
-          <button type="button" id="btn-delete-project" class="tool danger" title="Delete current project">Del proj</button>
-          <button type="button" id="btn-import" class="tool" title="Import JSON">Import</button>
-          <button type="button" id="btn-export" class="tool" title="Export JSON">Export</button>
-          <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save/Load sync">GitHub</button>
-          <button type="button" id="btn-github-pull" class="tool" title="Pull projects & catalog from GitHub">Pull</button>
-          <button type="button" id="btn-recover-catalog" class="tool" title="Restore built-in device catalog components">Recover components</button>
-          <button type="button" id="btn-factory-restore" class="tool primary" title="Restore Demo Build project + full catalog from package" onclick="window.factoryRestoreFromRepo && window.factoryRestoreFromRepo()">Factory restore</button>
-          <button type="button" id="btn-save" class="tool primary" title="Save locally and push to GitHub (if connected)">Save</button>
-          <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
-          <button type="button" id="btn-wirelist" class="tool" title="Wire & cable list panel (W)" data-tool-panel="wirelist">Wire list</button>
-          <button type="button" id="btn-print" class="tool" title="Print / PDF">Print</button>
-        </div>
-      </div>
-
-      <div class="project-meta">
-        <label class="project-switcher-wrap" title="Switch between saved projects">
-          <span class="project-switcher-label">Project</span>
-          <select id="project-switcher" aria-label="Switch project"></select>
-        </label>
-        <input type="text" id="project-name" value="Untitled Machine" placeholder="Project name" />
-        <span id="github-sync-badge" class="github-sync-badge off" title="GitHub sync status">GH · off</span>
         <span id="status-msg" class="status-msg">Ready</span>
       </div>
     </header>
