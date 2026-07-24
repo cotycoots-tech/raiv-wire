@@ -12,6 +12,8 @@ const DEFAULT_SETTINGS = {
   repo: "raiv-wire",
   branch: "main",
   autoSync: true,
+  /** Pull projects/catalog from GitHub when the app loads */
+  autoPull: true,
   pathProjects: "data/projects-library.json",
   pathCatalog: "data/device-catalog.json",
   pathActive: "data/active-project.json",
@@ -40,6 +42,11 @@ export function isGitHubConfigured(settings = loadGitHubSettings()) {
       settings.repo &&
       settings.branch
   );
+}
+
+/** Owner/repo/branch set — enough to pull public data (or with token for private). */
+export function canPullFromGitHub(settings = loadGitHubSettings()) {
+  return Boolean(settings.owner && settings.repo && settings.branch);
 }
 
 function apiBase(owner, repo) {
@@ -74,12 +81,16 @@ async function ghFetch(path, { token, method = "GET", body } = {}) {
   return data;
 }
 
-/** Get file SHA if it exists (needed to update). */
-export async function getFileMeta(settings, path) {
-  const url = `${apiBase(settings.owner, settings.repo)}/contents/${path
+function contentsUrl(settings, path) {
+  return `${apiBase(settings.owner, settings.repo)}/contents/${path
     .split("/")
     .map(encodeURIComponent)
     .join("/")}?ref=${encodeURIComponent(settings.branch)}`;
+}
+
+/** Get file SHA if it exists (needed to update). */
+export async function getFileMeta(settings, path) {
+  const url = contentsUrl(settings, path);
   try {
     const data = await ghFetch(url, { token: settings.token });
     return { sha: data.sha, path: data.path };
@@ -87,6 +98,13 @@ export async function getFileMeta(settings, path) {
     if (err.status === 404) return null;
     throw err;
   }
+}
+
+function fromBase64(b64) {
+  const binary = atob(b64.replace(/\n/g, ""));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
 }
 
 function toBase64(str) {
@@ -97,6 +115,139 @@ function toBase64(str) {
     binary += String.fromCharCode(b);
   });
   return btoa(binary);
+}
+
+/**
+ * Download a text file from the repo (authenticated API).
+ * Falls back to public raw.githubusercontent.com if no token and file is public.
+ * @returns {{ path, sha, content, json? } | null} null if 404
+ */
+export async function getRepoFileContent(settings, path) {
+  const hasToken = Boolean(settings.token);
+
+  if (hasToken) {
+    try {
+      const data = await ghFetch(contentsUrl(settings, path), {
+        token: settings.token,
+      });
+      if (data.encoding === "base64" && data.content) {
+        const text = fromBase64(data.content);
+        let json = null;
+        try {
+          json = JSON.parse(text);
+        } catch {
+          /* not json */
+        }
+        return { path: data.path || path, sha: data.sha, content: text, json };
+      }
+      return null;
+    } catch (err) {
+      if (err.status === 404) return null;
+      throw err;
+    }
+  }
+
+  // Public raw fallback (no token)
+  const rawUrl = `https://raw.githubusercontent.com/${encodeURIComponent(
+    settings.owner
+  )}/${encodeURIComponent(settings.repo)}/${encodeURIComponent(
+    settings.branch
+  )}/${path
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/")}?t=${Date.now()}`;
+  const res = await fetch(rawUrl, { cache: "no-store" });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Failed to fetch ${path}: ${res.status}`);
+  const text = await res.text();
+  let json = null;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    /* not json */
+  }
+  return { path, sha: null, content: text, json };
+}
+
+/**
+ * Pull projects library + catalog (+ optional active) from GitHub.
+ */
+export async function pullFromGitHub(settings = loadGitHubSettings()) {
+  if (!settings.owner || !settings.repo || !settings.branch) {
+    throw new Error("Set owner, repo, and branch in GitHub settings.");
+  }
+  // Pull can work with public raw URLs without a token
+  const projectsPath = settings.pathProjects || DEFAULT_SETTINGS.pathProjects;
+  const catalogPath = settings.pathCatalog || DEFAULT_SETTINGS.pathCatalog;
+  const activePath = settings.pathActive || DEFAULT_SETTINGS.pathActive;
+
+  const [projectsFile, catalogFile, activeFile] = await Promise.all([
+    getRepoFileContent(settings, projectsPath),
+    getRepoFileContent(settings, catalogPath),
+    getRepoFileContent(settings, activePath),
+  ]);
+
+  if (!projectsFile && !catalogFile && !activeFile) {
+    throw new Error(
+      "No data files found on GitHub yet. Click Save once to create data/projects-library.json."
+    );
+  }
+
+  return {
+    pulledAt: new Date().toISOString(),
+    projects: projectsFile?.json || null,
+    catalog: catalogFile?.json || null,
+    active: activeFile?.json || null,
+    files: {
+      projects: projectsFile?.path || null,
+      catalog: catalogFile?.path || null,
+      active: activeFile?.path || null,
+    },
+  };
+}
+
+/**
+ * Merge remote project library into local.
+ * Newer project.updatedAt wins per id; keeps local-only projects.
+ */
+export function mergeProjectLibraries(localLib, remoteLib) {
+  const localProjects = localLib?.projects || {};
+  const remoteProjects = remoteLib?.projects || {};
+  const merged = { ...localProjects };
+
+  for (const [id, rp] of Object.entries(remoteProjects)) {
+    if (!rp || typeof rp !== "object") continue;
+    const pid = rp.id || id;
+    const lp = merged[pid];
+    if (!lp) {
+      merged[pid] = { ...rp, id: pid };
+      continue;
+    }
+    const lt = lp.updatedAt || lp.createdAt || "";
+    const rt = rp.updatedAt || rp.createdAt || "";
+    if (rt >= lt) {
+      merged[pid] = { ...rp, id: pid };
+    }
+  }
+
+  const remoteSaved = remoteLib?.savedAt || "";
+  const localSaved = localLib?.savedAt || "";
+  let activeId = localLib?.activeId || "";
+  if (remoteLib?.activeId && remoteProjects[remoteLib.activeId]) {
+    if (!activeId || !merged[activeId] || remoteSaved >= localSaved) {
+      activeId = remoteLib.activeId;
+    }
+  }
+  if (!activeId || !merged[activeId]) {
+    activeId = Object.keys(merged)[0] || "";
+  }
+
+  return {
+    version: 1,
+    activeId,
+    projects: merged,
+    savedAt: remoteSaved > localSaved ? remoteSaved : localSaved,
+  };
 }
 
 /**

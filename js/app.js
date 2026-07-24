@@ -49,14 +49,18 @@ import {
   importCatalogFile,
   resetCatalogToDefaults,
   INVENTORY_GROUPS,
+  loadCatalog,
 } from "./catalog.js";
 
 import {
   loadGitHubSettings,
   saveGitHubSettings,
   isGitHubConfigured,
+  canPullFromGitHub,
   testGitHubConnection,
   syncToGitHub,
+  pullFromGitHub,
+  mergeProjectLibraries,
 } from "./github-sync.js";
 
 // ── State ──
@@ -2309,7 +2313,7 @@ function updateGitHubBadge(stateName) {
   badge.classList.remove("on", "off", "busy", "err");
   if (stateName === "busy") {
     badge.classList.add("busy");
-    badge.textContent = "GH · saving…";
+    badge.textContent = "GH · syncing…";
     return;
   }
   if (stateName === "err") {
@@ -2317,18 +2321,18 @@ function updateGitHubBadge(stateName) {
     badge.textContent = "GH · error";
     return;
   }
-  if (isGitHubConfigured(cfg) && cfg.autoSync) {
+  if (isGitHubConfigured(cfg)) {
     badge.classList.add("on");
     badge.textContent = `GH · ${cfg.owner}/${cfg.repo}`;
-    badge.title = `Connected: ${cfg.owner}/${cfg.repo}@${cfg.branch} — Save pushes data/`;
-  } else if (isGitHubConfigured(cfg)) {
+    badge.title = `Connected: ${cfg.owner}/${cfg.repo}@${cfg.branch}. Save=push, Pull=download. Auto-push: ${cfg.autoSync ? "on" : "off"}, Auto-pull: ${cfg.autoPull !== false ? "on" : "off"}`;
+  } else if (canPullFromGitHub(cfg)) {
     badge.classList.add("on");
-    badge.textContent = "GH · local+ready";
-    badge.title = "Token saved; auto-sync is off. Save is local only unless you enable auto-sync.";
+    badge.textContent = "GH · pull-only";
+    badge.title = "Owner/repo set — can Pull public data. Add a token to Save/push.";
   } else {
     badge.classList.add("off");
     badge.textContent = "GH · off";
-    badge.title = "Not connected. Click GitHub to add a personal access token.";
+    badge.title = "Not connected. Click GitHub to set repo + token.";
   }
 }
 
@@ -2339,11 +2343,12 @@ function openGitHubSettings() {
   $("#gh-branch").value = s.branch || "main";
   $("#gh-token").value = s.token || "";
   $("#gh-autosync").value = s.autoSync ? "1" : "0";
+  $("#gh-autopull").value = s.autoPull !== false ? "1" : "0";
   $("#gh-path-projects").value = s.pathProjects || "data/projects-library.json";
   $("#gh-path-catalog").value = s.pathCatalog || "data/device-catalog.json";
   $("#gh-test-result").textContent = isGitHubConfigured(s)
-    ? "Token on file — test connection or update settings."
-    : "No token yet — paste a PAT with Contents read/write.";
+    ? "Token on file — Test, Pull now, or Save settings."
+    : "Add owner/repo (and token for push). Public repos can Pull without a token.";
   $("#github-modal")?.classList.remove("hidden");
 }
 
@@ -2354,10 +2359,119 @@ function readGitHubForm() {
     branch: ($("#gh-branch")?.value || "main").trim() || "main",
     token: ($("#gh-token")?.value || "").trim(),
     autoSync: $("#gh-autosync")?.value === "1",
+    autoPull: $("#gh-autopull")?.value === "1",
     pathProjects: ($("#gh-path-projects")?.value || "data/projects-library.json").trim(),
     pathCatalog: ($("#gh-path-catalog")?.value || "data/device-catalog.json").trim(),
     pathActive: "data/active-project.json",
   };
+}
+
+function applyRemoteLibrary(remoteLib, { preferRemoteActive = true } = {}) {
+  if (!remoteLib?.projects || typeof remoteLib.projects !== "object") {
+    return { projectCount: 0 };
+  }
+  const merged = mergeProjectLibraries(
+    {
+      activeId: state.library.activeId,
+      projects: state.library.projects,
+      savedAt: state.library.savedAt,
+    },
+    remoteLib
+  );
+  state.library.projects = merged.projects;
+  state.library.activeId = preferRemoteActive
+    ? merged.activeId
+    : state.library.activeId && merged.projects[state.library.activeId]
+      ? state.library.activeId
+      : merged.activeId;
+  state.library.savedAt = merged.savedAt;
+
+  // Normalize project ids
+  for (const [key, p] of Object.entries(state.library.projects)) {
+    if (!p.id) p.id = key;
+    ensureProjectId(p);
+  }
+
+  const activeId = state.library.activeId;
+  if (activeId && state.library.projects[activeId]) {
+    state.project = deepClone(state.library.projects[activeId]);
+  } else {
+    const first = Object.keys(state.library.projects)[0];
+    if (first) {
+      state.library.activeId = first;
+      state.project = deepClone(state.library.projects[first]);
+    }
+  }
+  ensureProjectId(state.project);
+  state.selection = null;
+  state.history = [];
+  state.future = [];
+  state.dirty = false;
+  persistLibraryNow();
+  refreshProjectSwitcher();
+  return { projectCount: Object.keys(state.library.projects).length };
+}
+
+/**
+ * Download projects + catalog from GitHub and merge into this browser.
+ */
+async function loadFromGitHub({ fromUser = false, quiet = false } = {}) {
+  const cfg = loadGitHubSettings();
+  if (!canPullFromGitHub(cfg)) {
+    if (fromUser) {
+      alert("Set Owner and Repository in GitHub settings first.");
+      openGitHubSettings();
+    }
+    return { ok: false };
+  }
+
+  updateGitHubBadge("busy");
+  if (!quiet) setStatus("Pulling projects from GitHub…");
+
+  try {
+    const remote = await pullFromGitHub(cfg);
+    let projectCount = 0;
+    if (remote.projects) {
+      const r = applyRemoteLibrary(remote.projects, { preferRemoteActive: true });
+      projectCount = r.projectCount;
+    }
+    if (remote.catalog) {
+      try {
+        importCatalogJson(JSON.stringify(remote.catalog), "merge");
+        loadCatalog();
+        renderCatalogPalette();
+      } catch (err) {
+        console.warn("Catalog pull merge failed", err);
+      }
+    }
+
+    updateGitHubBadge();
+    render();
+    requestAnimationFrame(() => {
+      applyViewport(viewportEl, state.project.view || { x: 0, y: 0, scale: 1 });
+      render();
+    });
+
+    const msg = `Pulled from GitHub: ${projectCount} project${projectCount === 1 ? "" : "s"}${
+      remote.catalog ? " + catalog" : ""
+    } → ${cfg.owner}/${cfg.repo}`;
+    setStatus(msg);
+    if (fromUser && !quiet) {
+      // lightweight confirm of success
+    }
+    return { ok: true, projectCount, remote };
+  } catch (err) {
+    updateGitHubBadge("err");
+    setStatus("GitHub pull failed: " + err.message);
+    if (fromUser) {
+      alert(
+        "Could not pull from GitHub:\n\n" +
+          err.message +
+          "\n\nTip: Click Save on a machine that has your work first, so data/projects-library.json exists on the repo."
+      );
+    }
+    return { ok: false, error: err };
+  }
 }
 
 function bindGitHubSettingsModal() {
@@ -2372,23 +2486,36 @@ function bindGitHubSettingsModal() {
     updateGitHubBadge();
     $("#gh-test-result").textContent = "Token cleared from this browser.";
   });
-  $("#gh-save-settings")?.addEventListener("click", () => {
+  $("#gh-save-settings")?.addEventListener("click", async () => {
     const s = readGitHubForm();
     saveGitHubSettings(s);
     updateGitHubBadge();
     $("#github-modal")?.classList.add("hidden");
     setStatus(
       isGitHubConfigured(s)
-        ? `GitHub connected: ${s.owner}/${s.repo} (${s.autoSync ? "auto-sync on" : "auto-sync off"})`
-        : "GitHub settings saved (not fully connected — add token)"
+        ? `GitHub connected: ${s.owner}/${s.repo} (push ${s.autoSync ? "on" : "off"}, pull ${s.autoPull ? "on" : "off"})`
+        : canPullFromGitHub(s)
+          ? `GitHub repo set (${s.owner}/${s.repo}) — Pull works; add token to Save/push`
+          : "GitHub settings saved"
     );
+    if (s.autoPull && canPullFromGitHub(s)) {
+      await loadFromGitHub({ fromUser: false, quiet: true });
+    }
   });
   $("#gh-test")?.addEventListener("click", async () => {
     const s = readGitHubForm();
     const el = $("#gh-test-result");
     el.textContent = "Testing…";
     try {
-      // Temporarily use form values without requiring save
+      if (!s.token) {
+        // Try public pull as a connectivity check
+        saveGitHubSettings({ ...loadGitHubSettings(), ...s });
+        const remote = await pullFromGitHub(s);
+        const n = Object.keys(remote.projects?.projects || {}).length;
+        el.textContent = `Public pull OK — found ${n} project(s) in data/ (add a token to push/Save).`;
+        setStatus("GitHub public pull OK");
+        return;
+      }
       const info = await testGitHubConnection(s);
       el.textContent = `OK — ${info.fullName} (${info.private ? "private" : "public"}), default branch ${info.defaultBranch}`;
       setStatus("GitHub connection OK");
@@ -2396,6 +2523,12 @@ function bindGitHubSettingsModal() {
       el.textContent = `Failed: ${err.message}`;
       setStatus("GitHub test failed");
     }
+  });
+  $("#gh-pull-now")?.addEventListener("click", async () => {
+    const s = readGitHubForm();
+    saveGitHubSettings(s);
+    $("#github-modal")?.classList.add("hidden");
+    await loadFromGitHub({ fromUser: true });
   });
 }
 
@@ -2872,6 +3005,7 @@ function bindUI() {
   $("#btn-export-csv").addEventListener("click", exportCSV);
   $("#btn-save")?.addEventListener("click", () => saveAll({ fromUser: true }));
   $("#btn-github-settings")?.addEventListener("click", openGitHubSettings);
+  $("#btn-github-pull")?.addEventListener("click", () => loadFromGitHub({ fromUser: true }));
   $("#btn-print").addEventListener("click", () => printToPdf());
   window.addEventListener("beforeprint", preparePrintLayout);
   window.addEventListener("afterprint", restorePrintLayout);
@@ -2953,7 +3087,7 @@ function bindUI() {
 }
 
 // ── Init ──
-function init() {
+async function init() {
   buildPalette();
   bindUI();
   const loaded = loadPersisted();
@@ -2978,16 +3112,26 @@ function init() {
   refreshProjectSwitcher();
   setTool("select");
   render();
+
+  // Pull remote projects so GitHub is source of truth across browsers
+  const cfg = loadGitHubSettings();
+  if (cfg.autoPull !== false && canPullFromGitHub(cfg)) {
+    await loadFromGitHub({ fromUser: false, quiet: true });
+  }
+
   // fit after layout
   requestAnimationFrame(() => {
-    if (!loaded) setView(fitView(svg, state.project));
-    else applyViewport(viewportEl, state.project.view || { x: 0, y: 0, scale: 1 });
+    applyViewport(
+      viewportEl,
+      state.project.view || { x: 0, y: 0, scale: 1 }
+    );
+    if (!loaded && !canPullFromGitHub(cfg)) {
+      setView(fitView(svg, state.project));
+    }
     render();
     const n = Object.keys(state.library.projects).length;
     setStatus(
-      loaded
-        ? `Restored: ${state.project.name} (${n} project${n === 1 ? "" : "s"} in library)`
-        : "Demo project loaded — use Project dropdown or New to add more"
+      `Ready: ${state.project.name} (${n} project${n === 1 ? "" : "s"}). Use Save to push · Pull to download from GitHub.`
     );
   });
 

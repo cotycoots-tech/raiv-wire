@@ -66,7 +66,8 @@
           <button type="button" id="btn-delete-project" class="tool danger" title="Delete current project">Del proj</button>
           <button type="button" id="btn-import" class="tool" title="Import JSON">Import</button>
           <button type="button" id="btn-export" class="tool" title="Export JSON">Export</button>
-          <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save sync">GitHub</button>
+          <button type="button" id="btn-github-settings" class="tool" title="Connect GitHub for Save/Load sync">GitHub</button>
+          <button type="button" id="btn-github-pull" class="tool" title="Pull projects & catalog from GitHub">Pull</button>
           <button type="button" id="btn-save" class="tool primary" title="Save locally and push to GitHub (if connected)">Save</button>
           <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
           <button type="button" id="btn-wirelist" class="tool" title="Wire & cable list panel (W)" data-tool-panel="wirelist">Wire list</button>
@@ -332,10 +333,9 @@
     <div class="modal-card modal-card-wide">
       <h3 id="github-modal-title">Connect GitHub</h3>
       <p class="hint" style="margin-top:0">
-        <strong>Save</strong> writes your projects and device catalog into this repository (folder <code>data/</code>).
-        Create a fine-grained token with <strong>Contents: Read and write</strong> on repo
-        <code>cotycoots-tech/raiv-wire</code> (or your fork).
-        The token stays in this browser only — it is never uploaded inside project JSON.
+        <strong>Save</strong> pushes projects + catalog to <code>data/</code> on GitHub.
+        <strong>Pull</strong> downloads them into this browser (required to see updates from other machines).
+        Token needs <strong>Contents: Read and write</strong> for push; public repos can pull without a token.
       </p>
       <div class="field-row">
         <div class="field">
@@ -353,12 +353,19 @@
           <input type="text" id="gh-branch" placeholder="main" autocomplete="off" />
         </div>
         <div class="field">
-          <label>Auto-sync on Save</label>
+          <label>Auto-push on Save</label>
           <select id="gh-autosync">
             <option value="1">On — Save pushes to GitHub</option>
             <option value="0">Off — Save is local only</option>
           </select>
         </div>
+      </div>
+      <div class="field">
+        <label>Auto-pull on page load</label>
+        <select id="gh-autopull">
+          <option value="1">On — merge remote projects when app opens</option>
+          <option value="0">Off — only local until you click Pull</option>
+        </select>
       </div>
       <div class="field">
         <label>Personal access token</label>
@@ -377,6 +384,7 @@
       <p id="gh-test-result" class="hint" style="min-height:1.2em"></p>
       <div class="modal-actions">
         <button type="button" id="gh-test" class="btn-secondary">Test connection</button>
+        <button type="button" id="gh-pull-now" class="btn-secondary">Pull now</button>
         <button type="button" id="gh-clear-token" class="btn-secondary">Clear token</button>
         <button type="button" id="gh-cancel" class="btn-secondary">Cancel</button>
         <button type="button" id="gh-save-settings" class="btn-primary">Save settings</button>
