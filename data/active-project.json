@@ -1,0 +1,671 @@
+{
+  "type": "raiv-wire-active-project",
+  "version": 1,
+  "savedAt": "2026-07-24T16:32:30.287Z",
+  "project": {
+    "version": 1,
+    "id": "proj_mrz5jajb_2",
+    "name": "Demo Build",
+    "createdAt": "2026-07-24T16:25:47.543Z",
+    "updatedAt": "2026-07-24T16:32:30.286Z",
+    "nodes": [
+      {
+        "id": "node_mrz5jajb_3",
+        "type": "plc",
+        "category": "device",
+        "tag": "PLC1",
+        "name": "Main PLC",
+        "description": "",
+        "x": 80,
+        "y": 120,
+        "width": 140,
+        "height": 100,
+        "terminals": [
+          {
+            "id": "L+",
+            "name": "+24V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "M",
+            "name": "0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DI0",
+            "name": "DI 0.0",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DI1",
+            "name": "DI 0.1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DI2",
+            "name": "DI 0.2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DI3",
+            "name": "DI 0.3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DO0",
+            "name": "DO 0.0",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DO1",
+            "name": "DO 0.1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "COM",
+            "name": "COM",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Control panel CP-1",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "node_mrz5jajb_4",
+        "type": "psu",
+        "category": "device",
+        "tag": "PS1",
+        "name": "24V PSU",
+        "description": "",
+        "x": 80,
+        "y": 280,
+        "width": 100,
+        "height": 80,
+        "terminals": [
+          {
+            "id": "L",
+            "name": "L / Hot",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "N",
+            "name": "N",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "+V",
+            "name": "+24V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "0V",
+            "name": "0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE2",
+            "name": "PE DC",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "node_mrz5jajb_5",
+        "type": "jbox",
+        "category": "jbox",
+        "tag": "JB1",
+        "name": "Field junction",
+        "description": "",
+        "x": 360,
+        "y": 160,
+        "width": 130,
+        "height": 100,
+        "terminals": [
+          {
+            "id": "1",
+            "name": "Term 1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "2",
+            "name": "Term 2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "3",
+            "name": "Term 3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "4",
+            "name": "Term 4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "5",
+            "name": "Term 5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "6",
+            "name": "Term 6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "7",
+            "name": "Term 7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "8",
+            "name": "Term 8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE bus",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Machine frame",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "node_mrz5jajb_6",
+        "type": "sensor",
+        "category": "device",
+        "tag": "B1",
+        "name": "Infeed photoeye",
+        "description": "",
+        "x": 580,
+        "y": 100,
+        "width": 90,
+        "height": 70,
+        "terminals": [
+          {
+            "id": "1",
+            "name": "BN +V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "2",
+            "name": "WH SIG",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "3",
+            "name": "BU 0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "4",
+            "name": "BK OUT",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "node_mrz5jajb_7",
+        "type": "motor",
+        "category": "device",
+        "tag": "M1",
+        "name": "Conveyor motor",
+        "description": "",
+        "x": 580,
+        "y": 260,
+        "width": 100,
+        "height": 90,
+        "terminals": [
+          {
+            "id": "U1",
+            "name": "U1 / T1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "V1",
+            "name": "V1 / T2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "W1",
+            "name": "W1 / T3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE / GND",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TS+",
+            "name": "Therm + ",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TS-",
+            "name": "Therm −",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "node_mrz5jajb_8",
+        "type": "vfd",
+        "category": "device",
+        "tag": "VFD1",
+        "name": "Conveyor drive",
+        "description": "",
+        "x": 360,
+        "y": 300,
+        "width": 120,
+        "height": 110,
+        "terminals": [
+          {
+            "id": "L1",
+            "name": "L1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L2",
+            "name": "L2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L3",
+            "name": "L3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "U",
+            "name": "U / T1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "V",
+            "name": "V / T2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "W",
+            "name": "W / T3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DI1",
+            "name": "DI1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "COM",
+            "name": "COM",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "+24",
+            "name": "+24V",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      }
+    ],
+    "cables": [
+      {
+        "id": "cable_mrz5jajb_a",
+        "cableId": "C001",
+        "templateId": "2c-control",
+        "name": "2C Control",
+        "type": "Control",
+        "awg": "18",
+        "length": "",
+        "notes": "",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "node_mrz5jajb_4",
+          "terminalId": "+V"
+        },
+        "to": {
+          "nodeId": "node_mrz5jajb_3",
+          "terminalId": "L+"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "RD",
+            "label": "+24V",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "+V",
+            "toTerminalId": "L+"
+          },
+          {
+            "index": 2,
+            "color": "BU",
+            "label": "0V",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "0V",
+            "toTerminalId": "M"
+          }
+        ],
+        "route": null
+      },
+      {
+        "id": "cable_mrz5jajc_b",
+        "cableId": "C002",
+        "templateId": "sensor-3w",
+        "name": "3-wire sensor",
+        "type": "Sensor",
+        "awg": "22",
+        "length": "8 ft",
+        "notes": "",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "node_mrz5jajb_6",
+          "terminalId": "1"
+        },
+        "to": {
+          "nodeId": "node_mrz5jajb_5",
+          "terminalId": "1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "+V",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "1",
+            "toTerminalId": "1"
+          },
+          {
+            "index": 2,
+            "color": "BK",
+            "label": "OUT",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "4",
+            "toTerminalId": "2"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "0V",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "3",
+            "toTerminalId": "3"
+          }
+        ],
+        "route": null
+      },
+      {
+        "id": "cable_mrz5jajc_c",
+        "cableId": "C003",
+        "templateId": "sensor-3w",
+        "name": "3-wire sensor",
+        "type": "Sensor",
+        "awg": "22",
+        "length": "",
+        "notes": "",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "node_mrz5jajb_5",
+          "terminalId": "1"
+        },
+        "to": {
+          "nodeId": "node_mrz5jajb_3",
+          "terminalId": "DI0"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "+V",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "1",
+            "toTerminalId": "L+"
+          },
+          {
+            "index": 2,
+            "color": "BK",
+            "label": "OUT",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "2",
+            "toTerminalId": "DI0"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "0V",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "3",
+            "toTerminalId": "M"
+          }
+        ],
+        "route": null
+      },
+      {
+        "id": "cable_mrz5jajc_d",
+        "cableId": "C004",
+        "templateId": "4c-3ph",
+        "name": "4C 3-Phase + PE",
+        "type": "Power",
+        "awg": "12",
+        "length": "12 ft",
+        "notes": "",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "node_mrz5jajb_8",
+          "terminalId": "U"
+        },
+        "to": {
+          "nodeId": "node_mrz5jajb_7",
+          "terminalId": "U1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BK",
+            "label": "L1",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "U",
+            "toTerminalId": "U1"
+          },
+          {
+            "index": 2,
+            "color": "RD",
+            "label": "L2",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "V",
+            "toTerminalId": "V1"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "L3",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "W",
+            "toTerminalId": "W1"
+          },
+          {
+            "index": 4,
+            "color": "GNYE",
+            "label": "PE",
+            "pinA": "",
+            "pinB": "",
+            "fromTerminalId": "PE",
+            "toTerminalId": "PE"
+          }
+        ],
+        "route": null
+      }
+    ],
+    "view": {
+      "x": -7.591397849462366,
+      "y": 61.10291858678952,
+      "scale": 0.9489247311827957
+    },
+    "meta": {
+      "drawingNumber": "WD-DEMO-001",
+      "revision": "A",
+      "drawnBy": "",
+      "notes": ""
+    }
+  }
+}
