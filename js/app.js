@@ -31,6 +31,8 @@ import {
   fitView,
   contentBounds,
   getTerminalPositions,
+  cableEndpoints,
+  getCableRouteHandle,
 } from "./canvas.js";
 
 import {
@@ -76,6 +78,7 @@ const state = {
   activeColorId: "RD",
   hoverTerm: null,
   dragging: null, // { nodeId, ox, oy }
+  cableDragging: null, // { cableId, moved }
   panning: null, // { sx, sy, vx, vy }
   history: [],
   future: [],
@@ -1082,6 +1085,11 @@ function cablePropsHtml(cable) {
       <button type="button" class="btn-add-term" id="btn-add-cond" style="margin-top:8px">+ Add conductor</button>
     </div>
     <div class="field">
+      <label>Route layout</label>
+      <p class="hint" style="margin:0 0 6px">Click-hold and drag the cable (or blue handle) on the canvas to bend the path.</p>
+      <button type="button" class="btn-secondary" id="cf-reset-route">Reset cable route</button>
+    </div>
+    <div class="field">
       <label>Notes</label>
       <textarea id="cf-notes">${escapeAttr(cable.notes || "")}</textarea>
     </div>
@@ -1113,6 +1121,12 @@ function bindCableProps(cable) {
   $("#cf-type")?.addEventListener("change", (e) => apply(() => (cable.type = e.target.value)));
   $("#cf-len")?.addEventListener("change", (e) => apply(() => (cable.length = e.target.value)));
   $("#cf-notes")?.addEventListener("change", (e) => apply(() => (cable.notes = e.target.value)));
+  $("#cf-reset-route")?.addEventListener("click", () => {
+    apply(() => {
+      cable.route = null;
+    });
+    setStatus(`Cable ${cable.cableId} route reset to default`);
+  });
   $("#cf-terminated")?.addEventListener("change", (e) => {
     apply(() => {
       cable.terminated = e.target.value === "1";
@@ -1829,11 +1843,32 @@ function onPointerDown(e) {
     return;
   }
 
-  // cable path hit
-  const cableTarget = e.target.closest?.("[data-cable-id]") || (e.target.dataset?.cableId ? e.target : null);
-  if (cableTarget?.dataset?.cableId) {
-    state.selection = { type: "cable", id: cableTarget.dataset.cableId };
+  // cable path / route-handle hit — click-hold drag to adjust layout
+  const cableTarget =
+    e.target.closest?.("[data-cable-id]") ||
+    (e.target.dataset?.cableId ? e.target : null);
+  if (cableTarget?.dataset?.cableId && state.tool === "select") {
+    const cableId = cableTarget.dataset.cableId;
+    state.selection = { type: "cable", id: cableId };
+    state.cableDragging = {
+      cableId,
+      moved: false,
+      fromHandle: e.target.dataset?.routeHandle === "1",
+    };
+    // Ensure route exists so drag has a control point
+    const cable = state.project.cables.find((c) => c.id === cableId);
+    if (cable) {
+      const ep = cableEndpoints(cable, state.project.nodes);
+      if (ep) {
+        const h = getCableRouteHandle(cable, ep);
+        if (!cable.route) cable.route = {};
+        if (typeof cable.route.midX !== "number") cable.route.midX = h.midX;
+        if (typeof cable.route.midY !== "number") cable.route.midY = h.midY;
+      }
+    }
+    canvasContainer.classList.add("cable-dragging");
     render();
+    setStatus("Drag cable to adjust route — release to place");
     return;
   }
 
@@ -1920,6 +1955,24 @@ function onPointerMove(e) {
     return;
   }
 
+  if (state.cableDragging) {
+    const cable = state.project.cables.find(
+      (c) => c.id === state.cableDragging.cableId
+    );
+    if (cable) {
+      if (!state.cableDragging.moved) {
+        pushHistory();
+        state.cableDragging.moved = true;
+      }
+      if (!cable.route) cable.route = {};
+      // Free-form elbow: midX / midY follow cursor (orthogonal segments rebuild)
+      cable.route.midX = Math.round(world.x);
+      cable.route.midY = Math.round(world.y);
+      renderDiagram(layers, state.project, state.selection, state.hoverTerm);
+    }
+    return;
+  }
+
   const termHit = findTerminalAt(state.project.nodes, world.x, world.y, 12);
   const prev = state.hoverTerm;
   state.hoverTerm = termHit
@@ -1948,6 +2001,20 @@ function onPointerUp() {
       persistDebounced();
     }
     state.dragging = null;
+  }
+  if (state.cableDragging) {
+    canvasContainer.classList.remove("cable-dragging");
+    if (state.cableDragging.moved) {
+      state.project.updatedAt = new Date().toISOString();
+      persistDebounced();
+      const c = state.project.cables.find((x) => x.id === state.cableDragging.cableId);
+      setStatus(
+        c
+          ? `Cable ${c.cableId} route updated`
+          : "Cable route updated"
+      );
+    }
+    state.cableDragging = null;
   }
 }
 

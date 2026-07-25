@@ -1071,7 +1071,7 @@ button {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  cursor: pointer;
+  cursor: grab;
   transition: stroke-width 0.1s, opacity 0.1s;
 }
 
@@ -1083,6 +1083,16 @@ button {
 .cable-path.selected {
   stroke-width: 4 !important;
   filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.6));
+}
+
+.cable-route-handle,
+.cable-route-handle-hit {
+  cursor: move;
+}
+
+#canvas-container.cable-dragging,
+#canvas-container.cable-dragging .cable-path {
+  cursor: grabbing !important;
 }
 
 .cable-label-bg {

@@ -130,7 +130,7 @@ export function findNodeAt(nodes, worldX, worldY) {
   return null;
 }
 
-function cableEndpoints(cable, nodes) {
+export function cableEndpoints(cable, nodes) {
   const fromNode = nodes.find((n) => n.id === cable.from.nodeId);
   const toNode = nodes.find((n) => n.id === cable.to.nodeId);
   if (!fromNode || !toNode) return null;
@@ -143,16 +143,62 @@ function cableEndpoints(cable, nodes) {
   return { x1: fp.x, y1: fp.y, x2: tp.x, y2: tp.y };
 }
 
+/**
+ * Resolve cable route control point.
+ * route: { midX, midY } — orthog path elbows (click-drag to adjust layout)
+ */
+export function getCableRouteHandle(cable, ep) {
+  if (!ep) return null;
+  const r = cable.route || {};
+  const midX =
+    typeof r.midX === "number" && Number.isFinite(r.midX)
+      ? r.midX
+      : (ep.x1 + ep.x2) / 2;
+  const midY =
+    typeof r.midY === "number" && Number.isFinite(r.midY)
+      ? r.midY
+      : (ep.y1 + ep.y2) / 2;
+  return { midX, midY };
+}
+
+/**
+ * Orthogonal cable path with adjustable elbows:
+ * start → H to midX → V to midY → H to x2 → V to end
+ * Degenerates cleanly when midX/midY align with defaults.
+ */
+export function cablePathD(ep, handle, yOffset = 0) {
+  const x1 = ep.x1;
+  const y1 = ep.y1 + yOffset;
+  const x2 = ep.x2;
+  const y2 = ep.y2 + yOffset;
+  const mx = handle?.midX ?? (x1 + x2) / 2;
+  const my = (handle?.midY ?? (ep.y1 + ep.y2) / 2) + yOffset;
+  return `M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${my} L ${x2} ${my} L ${x2} ${y2}`;
+}
+
 function orthogonalPath(x1, y1, x2, y2) {
   const mx = (x1 + x2) / 2;
-  // simple orthog: H-V-H
-  return `M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${y2} L ${x2} ${y2}`;
+  return cablePathD(
+    { x1, y1, x2, y2 },
+    { midX: mx, midY: (y1 + y2) / 2 },
+    0
+  );
 }
 
 function primaryCableColor(cable) {
   const first = (cable.conductors || [])[0];
   if (!first) return "#94a3b8";
   return colorById(first.color).stroke;
+}
+
+/** Label position along routed path */
+function cableLabelPoint(ep, handle) {
+  const h = handle || getCableRouteHandle({ route: null }, ep);
+  return {
+    x: (ep.x1 + ep.x2) / 2,
+    // sit near the horizontal mid segment
+    y: (h.midY ?? (ep.y1 + ep.y2) / 2) - 10,
+  };
 }
 
 export function renderDiagram(layers, project, selection, hoverTerm) {
@@ -171,8 +217,11 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
     if (!ep) continue;
     const selected = selection?.type === "cable" && selection.id === cable.id;
     const color = primaryCableColor(cable);
+    const handle = getCableRouteHandle(cable, ep);
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.dataset.cableId = cable.id;
+    g.classList.add("cable-group");
+    if (selected) g.classList.add("selected");
 
     // multi-conductor visual: parallel offset strokes for up to 4 colors
     const conductors = cable.conductors || [];
@@ -182,8 +231,7 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
       const col = colorById(c.color);
       const offset = (i - (showN - 1) / 2) * 2.2;
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      // offset approximate via perpendicular — use simple y offset on mid for visual bundle
-      const d = orthogonalPath(ep.x1, ep.y1 + offset, ep.x2, ep.y2 + offset);
+      const d = cablePathD(ep, handle, offset);
       path.setAttribute("d", d);
       path.setAttribute("class", `cable-path${selected ? " selected" : ""}`);
       path.setAttribute("stroke", col.stroke);
@@ -193,12 +241,14 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
       g.appendChild(path);
     }
 
-    // hit area
+    // hit area (wide for click-hold drag)
     const hit = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    hit.setAttribute("d", orthogonalPath(ep.x1, ep.y1, ep.x2, ep.y2));
-    hit.setAttribute("class", "cable-path");
+    hit.setAttribute("d", cablePathD(ep, handle, 0));
+    hit.setAttribute("class", "cable-path cable-hit");
     hit.setAttribute("stroke", "transparent");
-    hit.setAttribute("stroke-width", "12");
+    hit.setAttribute("stroke-width", "14");
+    hit.setAttribute("fill", "none");
+    hit.style.cursor = "grab";
     hit.dataset.cableId = cable.id;
     g.appendChild(hit);
 
@@ -207,7 +257,6 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
       const addEndMarker = (x, y, end) => {
         const isLeads = end?.kind === "flying-leads" || end?.kind === "open";
         if (isLeads) {
-          // short tick marks for open leads
           for (let i = -1; i <= 1; i++) {
             const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
             tick.setAttribute("x1", x - 4);
@@ -238,15 +287,51 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
       addEndMarker(ep.x2, ep.y2, cable.endB);
     }
 
+    // route bend handle (always present for hit; stronger when selected)
+    const hx = handle.midX;
+    const hy = handle.midY;
+    const handleHit = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    handleHit.setAttribute("cx", hx);
+    handleHit.setAttribute("cy", hy);
+    handleHit.setAttribute("r", selected ? 10 : 8);
+    handleHit.setAttribute("fill", "transparent");
+    handleHit.setAttribute("class", "cable-route-handle-hit");
+    handleHit.style.cursor = "move";
+    handleHit.dataset.cableId = cable.id;
+    handleHit.dataset.routeHandle = "1";
+    g.appendChild(handleHit);
+
+    if (selected) {
+      const handleRing = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      handleRing.setAttribute("cx", hx);
+      handleRing.setAttribute("cy", hy);
+      handleRing.setAttribute("r", 7);
+      handleRing.setAttribute("class", "cable-route-handle");
+      handleRing.setAttribute("fill", "#0b1220");
+      handleRing.setAttribute("stroke", "#38bdf8");
+      handleRing.setAttribute("stroke-width", "2");
+      handleRing.dataset.cableId = cable.id;
+      handleRing.dataset.routeHandle = "1";
+      g.appendChild(handleRing);
+
+      const handleDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      handleDot.setAttribute("cx", hx);
+      handleDot.setAttribute("cy", hy);
+      handleDot.setAttribute("r", 3);
+      handleDot.setAttribute("fill", "#38bdf8");
+      handleDot.dataset.cableId = cable.id;
+      handleDot.dataset.routeHandle = "1";
+      g.appendChild(handleDot);
+    }
+
     // label
-    const mx = (ep.x1 + ep.x2) / 2;
-    const my = (ep.y1 + ep.y2) / 2 - 8;
+    const lp = cableLabelPoint(ep, handle);
     const termMark = cable.terminated ? "·T" : "";
     const label = `${cable.cableId || "C"}${termMark}`;
     const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     const tw = label.length * 6.2 + 10;
-    bg.setAttribute("x", mx - tw / 2);
-    bg.setAttribute("y", my - 8);
+    bg.setAttribute("x", lp.x - tw / 2);
+    bg.setAttribute("y", lp.y - 8);
     bg.setAttribute("width", tw);
     bg.setAttribute("height", 14);
     bg.setAttribute("class", "cable-label-bg");
@@ -257,8 +342,8 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
     g.appendChild(bg);
 
     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", mx);
-    text.setAttribute("y", my + 2);
+    text.setAttribute("x", lp.x);
+    text.setAttribute("y", lp.y + 2);
     text.setAttribute("text-anchor", "middle");
     text.setAttribute("class", "cable-label-text");
     text.setAttribute("fill", cable.terminated ? "#2dd4bf" : color);
@@ -428,8 +513,13 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
 export function renderCablePreview(overlay, from, toWorld) {
   overlay.innerHTML = "";
   if (!from || !toWorld) return;
+  const ep = { x1: from.x, y1: from.y, x2: toWorld.x, y2: toWorld.y };
+  const handle = {
+    midX: (from.x + toWorld.x) / 2,
+    midY: (from.y + toWorld.y) / 2,
+  };
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", orthogonalPath(from.x, from.y, toWorld.x, toWorld.y));
+  path.setAttribute("d", cablePathD(ep, handle, 0));
   path.setAttribute("class", "cable-preview-line");
   overlay.appendChild(path);
 }

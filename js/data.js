@@ -1416,7 +1416,8 @@ export function createCableFromTemplate(templateId, from, to, existingCables = [
       fromTerminalId: from.terminalId,
       toTerminalId: to.terminalId,
     })),
-    route: null, // optional waypoints later
+    // Orthogonal layout elbows: { midX, midY } — drag cable on canvas to set
+    route: null,
   };
 }
 
