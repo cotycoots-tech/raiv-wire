@@ -1,7 +1,7 @@
 {
   "type": "raiv-wire-projects-library",
   "version": 1,
-  "savedAt": "2026-07-25T02:16:31.037Z",
+  "savedAt": "2026-07-25T09:37:06.118Z",
   "activeId": "proj_mrz5jajb_2",
   "projects": {
     "proj_mrz5jajb_2": {
@@ -9,7 +9,7 @@
       "id": "proj_mrz5jajb_2",
       "name": "Demo Build",
       "createdAt": "2026-07-24T16:25:47.543Z",
-      "updatedAt": "2026-07-25T02:16:31.034Z",
+      "updatedAt": "2026-07-25T09:37:06.117Z",
       "nodes": [
         {
           "id": "node_mrz5jajb_3",
@@ -18,8 +18,8 @@
           "tag": "PLC1",
           "name": "Main PLC",
           "description": "",
-          "x": 80,
-          "y": 120,
+          "x": -164,
+          "y": 140,
           "width": 140,
           "height": 100,
           "terminals": [
@@ -99,8 +99,8 @@
           "tag": "PS1",
           "name": "24V PSU",
           "description": "",
-          "x": 80,
-          "y": 280,
+          "x": 118,
+          "y": 291,
           "width": 100,
           "height": 80,
           "terminals": [
@@ -156,8 +156,8 @@
           "tag": "JB1",
           "name": "Field junction",
           "description": "",
-          "x": 277,
-          "y": 3,
+          "x": 314,
+          "y": -8,
           "width": 130,
           "height": 100,
           "terminals": [
@@ -231,8 +231,8 @@
           "tag": "B1",
           "name": "Infeed photoeye",
           "description": "",
-          "x": 580,
-          "y": 100,
+          "x": 672,
+          "y": 116,
           "width": 90,
           "height": 70,
           "terminals": [
@@ -276,8 +276,8 @@
           "tag": "M1",
           "name": "Conveyor motor",
           "description": "",
-          "x": 580,
-          "y": 260,
+          "x": 324,
+          "y": 516,
           "width": 100,
           "height": 90,
           "terminals": [
@@ -517,8 +517,8 @@
           "tag": "PB1",
           "name": "Fuji/ Mom.LED",
           "description": "22 mm flush momentary pushbutton, 24 V DC LED, NO contact block",
-          "x": 63,
-          "y": -84,
+          "x": -60,
+          "y": -81,
           "width": 80,
           "height": 75,
           "terminals": [
@@ -735,7 +735,10 @@
               "toTerminalId": "M"
             }
           ],
-          "route": null
+          "route": {
+            "midX": 243,
+            "midY": 278
+          }
         },
         {
           "id": "cable_mrz5jajc_b",
@@ -797,7 +800,10 @@
               "toTerminalId": "3"
             }
           ],
-          "route": null
+          "route": {
+            "midX": 524,
+            "midY": 170
+          }
         },
         {
           "id": "cable_mrz5jajc_c",
@@ -859,7 +865,10 @@
               "toTerminalId": "M"
             }
           ],
-          "route": null
+          "route": {
+            "midX": 29,
+            "midY": 38
+          }
         },
         {
           "id": "cable_mrz5jajc_d",
@@ -930,13 +939,16 @@
               "toTerminalId": "PE"
             }
           ],
-          "route": null
+          "route": {
+            "midX": 286,
+            "midY": 451
+          }
         }
       ],
       "view": {
-        "x": -7.362428726688508,
-        "y": 189.31598011139903,
-        "scale": 0.9203035908360635
+        "x": 328.8130414998252,
+        "y": 207.47408814891776,
+        "scale": 0.9050123801479509
       },
       "meta": {
         "drawingNumber": "WD-DEMO-001",
