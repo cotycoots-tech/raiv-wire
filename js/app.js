@@ -94,9 +94,7 @@ const state = {
   landingsFilter: "focus",
   /** Never auto-open landings on canvas selection — user opens via Landings / L / bottom bar */
   landingsAutoOpen: false,
-  /** Sidebar wire list compact section open/closed */
-  wireListSideOpen: false,
-  /** Full wire list drawer open */
+  /** Full wire list bottom drawer open */
   wireListDrawerOpen: false,
   /** mid | tall */
   wireListDrawerSize: "mid",
@@ -121,7 +119,6 @@ const zoomLabel = $("#zoom-label");
 const cursorPos = $("#cursor-pos");
 const propsEmpty = $("#props-empty");
 const propsForm = $("#props-form");
-const wireTableBody = $("#wire-table-body");
 const wireTableDrawerBody = $("#wire-table-drawer-body");
 const landingMap = $("#landing-map");
 const landingContext = $("#landing-context");
@@ -812,17 +809,15 @@ function renderProps() {
 }
 
 function nodePropsHtml(node) {
+  const termCount = (node.terminals || []).length;
   const terms = (node.terminals || [])
     .map(
       (t, i) => `
       <div class="term-row" data-idx="${i}">
-        <span class="term-num">${i + 1}</span>
-        <input type="text" data-field="term-name" data-tid="${escapeAttr(t.id)}" value="${escapeAttr(t.name)}" placeholder="Landing name" />
-        <button type="button" class="btn-icon" data-action="del-term" data-tid="${escapeAttr(t.id)}" title="Remove">×</button>
-      </div>
-      <div class="term-row" style="grid-template-columns:48px 1fr;margin-top:-4px;margin-bottom:4px">
-        <span class="term-num" style="font-size:9px;color:var(--text-dim)">ID</span>
-        <input type="text" data-field="term-id" data-tid="${escapeAttr(t.id)}" value="${escapeAttr(t.id)}" />
+        <span class="term-num" title="Landing ${i + 1}">${i + 1}</span>
+        <input type="text" class="term-id-input" data-field="term-id" data-tid="${escapeAttr(t.id)}" value="${escapeAttr(t.id)}" placeholder="ID" title="Terminal ID" spellcheck="false" />
+        <input type="text" class="term-name-input" data-field="term-name" data-tid="${escapeAttr(t.id)}" value="${escapeAttr(t.name)}" placeholder="Landing name" title="Landing name" />
+        <button type="button" class="btn-icon" data-action="del-term" data-tid="${escapeAttr(t.id)}" title="Remove terminal">×</button>
       </div>
     `
     )
@@ -858,14 +853,17 @@ function nodePropsHtml(node) {
         <input type="text" id="pf-pn" value="${escapeAttr(node.partNumber || "")}" />
       </div>
     </div>
-    <div class="field">
-      <label>Notes</label>
-      <textarea id="pf-notes">${escapeAttr(node.description || "")}</textarea>
+    <div class="field field-term-landings">
+      <label>Terminal landings <span class="term-count-badge">${termCount}</span></label>
+      <div class="term-editor-head" aria-hidden="true">
+        <span>#</span><span>ID</span><span>Name</span><span></span>
+      </div>
+      <div class="term-editor" id="term-editor">${terms || `<div class="term-editor-empty">No terminals — add landings below</div>`}</div>
+      <button type="button" class="btn-add-term" id="btn-add-term">+ Add terminal</button>
     </div>
     <div class="field">
-      <label>Terminal landings</label>
-      <div class="term-editor" id="term-editor">${terms}</div>
-      <button type="button" class="btn-add-term" id="btn-add-term">+ Add terminal</button>
+      <label>Notes</label>
+      <textarea id="pf-notes" rows="2">${escapeAttr(node.description || "")}</textarea>
     </div>
     <button type="button" class="btn-catalog-save" id="btn-save-catalog">
       ${node.catalogId ? "Update device catalog" : "Save to device catalog"}
@@ -1198,13 +1196,12 @@ function bindCableProps(cable) {
   });
 }
 
-// ── Wire list (sidebar + expandable drawer) ──
+// ── Wire list (bottom expandable drawer only) ──
 function loadWireListPrefs() {
   try {
     const raw = localStorage.getItem(WIRELIST_PREF_KEY);
     if (!raw) return;
     const p = JSON.parse(raw);
-    if (typeof p.sideOpen === "boolean") state.wireListSideOpen = p.sideOpen;
     if (typeof p.drawerOpen === "boolean") state.wireListDrawerOpen = p.drawerOpen;
     if (p.drawerSize === "mid" || p.drawerSize === "tall") state.wireListDrawerSize = p.drawerSize;
     if (typeof p.customH === "number" && p.customH > 120) state.wireListCustomH = p.customH;
@@ -1218,7 +1215,6 @@ function saveWireListPrefs() {
     localStorage.setItem(
       WIRELIST_PREF_KEY,
       JSON.stringify({
-        sideOpen: state.wireListSideOpen,
         drawerOpen: state.wireListDrawerOpen,
         drawerSize: state.wireListDrawerSize,
         customH: state.wireListCustomH || null,
@@ -1230,22 +1226,15 @@ function saveWireListPrefs() {
 }
 
 function applyWireListUi() {
-  const section = $("#wire-list-section");
   const drawer = $("#wire-list-drawer");
   const panel = drawer?.querySelector(".wire-list-drawer-panel");
-
-  section?.classList.toggle("is-open", !!state.wireListSideOpen);
-  section?.classList.toggle("is-collapsed", !state.wireListSideOpen);
-  $("#btn-wirelist-side-toggle")?.setAttribute(
-    "aria-expanded",
-    state.wireListSideOpen ? "true" : "false"
-  );
 
   const open = !!state.wireListDrawerOpen;
   drawer?.classList.toggle("is-open", open);
   drawer?.classList.toggle("is-closed", !open);
   drawer?.classList.toggle("is-tall", state.wireListDrawerSize === "tall");
   drawer?.setAttribute("aria-hidden", open ? "false" : "true");
+  $("#btn-landings-wirelist")?.classList.toggle("wirelist-active", open);
   $("#btn-wirelist")?.classList.toggle("wirelist-active", open);
 
   if (panel) {
@@ -1255,12 +1244,6 @@ function applyWireListUi() {
       panel.style.height = "";
     }
   }
-}
-
-function setWireListSideOpen(open) {
-  state.wireListSideOpen = !!open;
-  applyWireListUi();
-  saveWireListPrefs();
 }
 
 function setWireListDrawerOpen(open) {
@@ -1407,18 +1390,11 @@ function bindPropsResize() {
 
 function bindWireListUi() {
   loadWireListPrefs();
-  // Drawer closed on load by default for canvas space (side can restore)
+  // Drawer closed on load by default for canvas space
   state.wireListDrawerOpen = false;
   applyWireListUi();
 
-  // Wire list open: landings slide button, sidebar expand, keyboard W
-  $("#btn-wirelist-side-toggle")?.addEventListener("click", () => {
-    setWireListSideOpen(!state.wireListSideOpen);
-  });
-  $("#btn-wirelist-expand")?.addEventListener("click", () => {
-    setWireListDrawerOpen(true);
-    setStatus("Wire list expanded");
-  });
+  // Wire list: bottom slide + keyboard W (properties panel copy removed)
   $("#btn-wirelist-close")?.addEventListener("click", () => setWireListDrawerOpen(false));
   $("#wire-list-drawer-backdrop")?.addEventListener("click", () => setWireListDrawerOpen(false));
   $("#btn-wirelist-size")?.addEventListener("click", () => {
@@ -1540,23 +1516,16 @@ function bindWireTableClicks(tbody) {
 }
 
 function renderWireTable() {
-  const side = buildWireTableRows(false);
   const full = buildWireTableRows(true);
-  const n = side.count;
+  const n = full.count;
   const label = n === 1 ? "1 cable" : `${n} cables`;
 
-  if (wireTableBody) {
-    wireTableBody.innerHTML = side.html;
-    bindWireTableClicks(wireTableBody);
-  }
   if (wireTableDrawerBody) {
     wireTableDrawerBody.innerHTML = full.html;
     bindWireTableClicks(wireTableDrawerBody);
   }
 
-  const countEl = $("#wire-list-count");
   const drawerCount = $("#wire-list-drawer-count");
-  if (countEl) countEl.textContent = String(n);
   if (drawerCount) drawerCount.textContent = label;
 }
 
@@ -3485,7 +3454,7 @@ function bindUI() {
   $("#btn-duplicate-project")?.addEventListener("click", duplicateProject);
   $("#btn-delete-project")?.addEventListener("click", deleteCurrentProject);
   $("#btn-export").addEventListener("click", exportJSON);
-  $("#btn-export-csv").addEventListener("click", exportCSV);
+  $("#btn-export-csv")?.addEventListener("click", exportCSV);
   $("#btn-save")?.addEventListener("click", (e) => {
     e.preventDefault();
     setStatus("Save clicked — writing local data…", "busy");
