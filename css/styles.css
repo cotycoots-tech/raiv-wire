@@ -203,15 +203,21 @@ button {
   color: var(--accent);
 }
 
+/* Emphasize on hover/active only — not permanently lit like a pressed tool */
 .tool.primary {
-  background: var(--primary);
-  color: #041018;
+  color: var(--text-muted);
   font-weight: 600;
+  background: transparent;
 }
 
 .tool.primary:hover {
-  filter: brightness(1.08);
-  color: #041018;
+  background: var(--bg-hover);
+  color: var(--accent);
+}
+
+.tool.primary:active {
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .tool.danger:hover {
