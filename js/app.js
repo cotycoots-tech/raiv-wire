@@ -1491,6 +1491,8 @@ function applyLandingsMode() {
 
   const open = mode !== "collapsed";
   $("#btn-landings-toggle")?.setAttribute("aria-expanded", open ? "true" : "false");
+  // Highlight Landings chip on the slide when panel is open
+  $("#btn-landings")?.classList.toggle("active", open);
   $("#btn-landings")?.classList.toggle("landings-active", open);
   $("#btn-landings-focus")?.classList.toggle("active", state.landingsFilter === "focus");
   $("#btn-landings-all")?.classList.toggle("active", state.landingsFilter === "all");
@@ -1520,17 +1522,18 @@ function bindLandingsUi() {
   state.landingsAutoOpen = false;
   applyLandingsMode();
 
-  $("#btn-landings")?.addEventListener("click", () => {
+  const openCloseLandings = () => {
     toggleLandingsPanel();
     setStatus(
       state.landingsMode === "collapsed"
         ? "Landings panel collapsed"
-        : "Landings panel open — use Collapse or Landings / L to close"
+        : "Landings panel open — use Landings / L to close"
     );
-  });
-  $("#btn-landings-toggle")?.addEventListener("click", () => toggleLandingsPanel());
-  $("#btn-landings-collapse")?.addEventListener("click", () => setLandingsMode("collapsed"));
-  // Wire list control lives on the landings slide (replaces Size)
+  };
+  // Landings control lives on the slide (replaces Collapse); also bottom title toggle + L key
+  $("#btn-landings")?.addEventListener("click", openCloseLandings);
+  $("#btn-landings-toggle")?.addEventListener("click", openCloseLandings);
+  // Wire list control lives on the landings slide
   $("#btn-landings-wirelist")?.addEventListener("click", () => {
     setWireListDrawerOpen(true);
     setStatus("Wire list panel open");
