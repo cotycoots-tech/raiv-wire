@@ -92,8 +92,7 @@
             <button type="button" id="btn-factory-restore" class="tool primary" title="Restore Demo Build project + full catalog from package" onclick="window.factoryRestoreFromRepo && window.factoryRestoreFromRepo()">Factory restore</button>
           </div>
           <div class="tool-group">
-            <button type="button" id="btn-landings" class="tool" title="Terminal landings panel (L)" data-tool-panel="landings">Landings</button>
-            <button type="button" id="btn-wirelist" class="tool" title="Wire & cable list panel (W)" data-tool-panel="wirelist">Wire list</button>
+            <button type="button" id="btn-landings" class="tool" title="Open or collapse terminal landings (L)" data-tool-panel="landings">Landings</button>
             <button type="button" id="btn-print" class="tool" title="Print / PDF">Print</button>
           </div>
         </div>
@@ -328,13 +327,13 @@
             <button type="button" id="btn-landings-focus" class="landing-chip active" title="Show selected device / cable ends">Selection</button>
             <button type="button" id="btn-landings-all" class="landing-chip" title="Show all devices">All</button>
           </div>
-          <button type="button" id="btn-landings-size" class="landing-chip" title="Cycle panel size: medium / tall">Size</button>
-          <button type="button" id="btn-landings-collapse" class="landing-chip" title="Collapse panel">Collapse</button>
+          <button type="button" id="btn-landings-wirelist" class="landing-chip" title="Open wire & cable list (W)">Wire list</button>
+          <button type="button" id="btn-landings-collapse" class="landing-chip" title="Collapse landings panel">Collapse</button>
         </div>
       </div>
       <div class="landing-body">
         <div id="landing-map" class="landing-map">
-          <div class="landing-placeholder">Place devices and junction boxes, then draw cables between terminals. Press <kbd>L</kbd> or click <strong>Landings</strong> to open this panel.</div>
+          <div class="landing-placeholder">Place devices and draw cables. Open this panel with <kbd>L</kbd>, the <strong>Landings</strong> toolbar button, or the bar below — it will not pop up when you select components.</div>
         </div>
       </div>
     </footer>

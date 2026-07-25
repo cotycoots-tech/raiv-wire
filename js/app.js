@@ -89,7 +89,8 @@ const state = {
   landingsMode: "collapsed",
   /** focus = selection-driven; all = every device */
   landingsFilter: "focus",
-  landingsAutoOpen: true,
+  /** Never auto-open landings on canvas selection — user opens via Landings / L / bottom bar */
+  landingsAutoOpen: false,
   /** Sidebar wire list compact section open/closed */
   wireListSideOpen: false,
   /** Full wire list drawer open */
@@ -236,7 +237,6 @@ function render() {
   }
   renderProps();
   renderWireTable();
-  maybeAutoOpenLandings();
   renderLandings();
   projectNameInput.value = state.project.name || "";
   updateZoomLabel();
@@ -1273,14 +1273,7 @@ function bindWireListUi() {
   state.wireListDrawerOpen = false;
   applyWireListUi();
 
-  $("#btn-wirelist")?.addEventListener("click", () => {
-    toggleWireListDrawer();
-    setStatus(
-      state.wireListDrawerOpen
-        ? "Wire list panel open"
-        : "Wire list panel closed"
-    );
-  });
+  // Wire list open: landings slide button, sidebar expand, keyboard W
   $("#btn-wirelist-side-toggle")?.addEventListener("click", () => {
     setWireListSideOpen(!state.wireListSideOpen);
   });
@@ -1441,7 +1434,8 @@ function loadLandingsPrefs() {
     if (p.filter === "focus" || p.filter === "all") {
       state.landingsFilter = p.filter;
     }
-    if (typeof p.autoOpen === "boolean") state.landingsAutoOpen = p.autoOpen;
+    // autoOpen is always off (user must open landings manually)
+    state.landingsAutoOpen = false;
     if (typeof p.customH === "number" && p.customH > 80) {
       state.landingsCustomH = p.customH;
     }
@@ -1457,7 +1451,7 @@ function saveLandingsPrefs() {
       JSON.stringify({
         mode: state.landingsMode,
         filter: state.landingsFilter,
-        autoOpen: state.landingsAutoOpen,
+        autoOpen: false,
         customH: state.landingsCustomH || null,
       })
     );
@@ -1520,22 +1514,10 @@ function cycleLandingsSize() {
   else setLandingsMode("mid");
 }
 
-let _landingsAutoOpenKey = null;
-function maybeAutoOpenLandings() {
-  if (!state.landingsAutoOpen) return;
-  if (state.landingsMode !== "collapsed") return;
-  if (!(state.selection?.type === "node" || state.selection?.type === "cable")) {
-    return;
-  }
-  const key = `${state.selection.type}:${state.selection.id}`;
-  // Only auto-open once per selection change (don't fight user after Collapse)
-  if (key === _landingsAutoOpenKey) return;
-  _landingsAutoOpenKey = key;
-  setLandingsMode("mid");
-}
-
 function bindLandingsUi() {
   loadLandingsPrefs();
+  // Force manual-open only (ignore any old autoOpen prefs)
+  state.landingsAutoOpen = false;
   applyLandingsMode();
 
   $("#btn-landings")?.addEventListener("click", () => {
@@ -1543,18 +1525,15 @@ function bindLandingsUi() {
     setStatus(
       state.landingsMode === "collapsed"
         ? "Landings panel collapsed"
-        : "Landings panel open — Selection / All filters available"
+        : "Landings panel open — use Collapse or Landings / L to close"
     );
   });
   $("#btn-landings-toggle")?.addEventListener("click", () => toggleLandingsPanel());
   $("#btn-landings-collapse")?.addEventListener("click", () => setLandingsMode("collapsed"));
-  $("#btn-landings-size")?.addEventListener("click", () => {
-    cycleLandingsSize();
-    setStatus(
-      state.landingsMode === "tall"
-        ? "Landings panel: tall"
-        : "Landings panel: medium"
-    );
+  // Wire list control lives on the landings slide (replaces Size)
+  $("#btn-landings-wirelist")?.addEventListener("click", () => {
+    setWireListDrawerOpen(true);
+    setStatus("Wire list panel open");
   });
   $("#btn-landings-focus")?.addEventListener("click", () => {
     state.landingsFilter = "focus";
@@ -1569,16 +1548,16 @@ function bindLandingsUi() {
     renderLandings();
   });
 
-  // Drag resize
+  // Drag resize only when already open (does not pop open on selection)
   const handle = $("#landing-resize-handle");
   if (handle) {
     let dragging = false;
     handle.addEventListener("pointerdown", (e) => {
       if (e.button !== 0) return;
+      if (state.landingsMode === "collapsed") return;
       dragging = true;
       landingBar?.classList.add("is-resizing");
       handle.setPointerCapture(e.pointerId);
-      if (state.landingsMode === "collapsed") setLandingsMode("mid");
       e.preventDefault();
     });
     handle.addEventListener("pointermove", (e) => {
@@ -1725,9 +1704,8 @@ function renderLandings() {
     card.addEventListener("click", () => {
       state.selection = { type: "node", id: card.dataset.nodeId };
       setTool("select");
-      if (state.landingsMode === "collapsed") setLandingsMode("mid");
       render();
-      // scroll card into view after re-render
+      // scroll card into view after re-render (panel stays as user left it)
       requestAnimationFrame(() => {
         landingMap
           ?.querySelector(`.landing-card[data-node-id="${card.dataset.nodeId}"]`)
