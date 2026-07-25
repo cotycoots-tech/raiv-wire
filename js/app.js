@@ -993,15 +993,15 @@ function cablePropsHtml(cable) {
     .map((cond, i) => {
       const colOpts = WIRE_COLORS.map(
         (c) =>
-          `<option value="${c.id}" ${c.id === cond.color ? "selected" : ""}>${c.id}</option>`
+          `<option value="${c.id}" ${c.id === cond.color ? "selected" : ""}>${c.id}${c.name ? " · " + c.name : ""}</option>`
       ).join("");
       return `
         <div class="conductor-row">
           <span class="c-num">${cond.index || i + 1}</span>
-          <input type="text" data-cond="${i}" data-field="label" value="${escapeAttr(cond.label || "")}" placeholder="Label" />
-          <select data-cond="${i}" data-field="color">${colOpts}</select>
-          <select data-cond="${i}" data-field="fromT">${terminalOptions(fromN, cond.fromTerminalId || cable.from.terminalId)}</select>
-          <select data-cond="${i}" data-field="toT">${terminalOptions(toN, cond.toTerminalId || cable.to.terminalId)}</select>
+          <input type="text" data-cond="${i}" data-field="label" value="${escapeAttr(cond.label || "")}" placeholder="Label" title="Conductor label" />
+          <select data-cond="${i}" data-field="color" title="Wire color">${colOpts}</select>
+          <select data-cond="${i}" data-field="fromT" title="From terminal">${terminalOptions(fromN, cond.fromTerminalId || cable.from.terminalId)}</select>
+          <select data-cond="${i}" data-field="toT" title="To terminal">${terminalOptions(toN, cond.toTerminalId || cable.to.terminalId)}</select>
         </div>
       `;
     })
@@ -1075,9 +1075,10 @@ function cablePropsHtml(cable) {
       </div>
     </div>
     <div class="field">
-      <label>Conductors (color · from · to)</label>
+      <label>Conductors (label · color · from · to)</label>
+      <p class="hint" style="margin:0 0 6px">Drag the left edge of this panel wider for easier editing.</p>
       <div class="conductor-list" id="cond-list">
-        <div class="conductor-row" style="font-size:9px;color:var(--text-dim);text-transform:uppercase">
+        <div class="conductor-row conductor-row-head" aria-hidden="true">
           <span>#</span><span>Label</span><span>Color</span><span>From term</span><span>To term</span>
         </div>
         ${condRows}
@@ -1279,6 +1280,129 @@ function cycleWireListDrawerSize() {
   state.wireListCustomH = null;
   applyWireListUi();
   saveWireListPrefs();
+}
+
+// ── Properties panel width (resizable) ──
+const PROPS_W_KEY = "raiv-wire-props-w-v1";
+const PROPS_W_DEFAULT = 360;
+const PROPS_W_MIN = 280;
+
+function propsWidthMax() {
+  return Math.min(720, Math.floor(window.innerWidth * 0.55));
+}
+
+function applyPropsWidth(px, { persist = false } = {}) {
+  const max = propsWidthMax();
+  const w = Math.min(Math.max(Math.round(px), PROPS_W_MIN), max);
+  document.documentElement.style.setProperty("--props-w", `${w}px`);
+  document.documentElement.setAttribute("data-props-resized", "1");
+  if (persist) {
+    try {
+      localStorage.setItem(PROPS_W_KEY, String(w));
+    } catch {
+      /* ignore */
+    }
+  }
+  return w;
+}
+
+function loadPropsWidth() {
+  try {
+    const raw = localStorage.getItem(PROPS_W_KEY);
+    if (raw != null && raw !== "") {
+      const n = Number(raw);
+      if (Number.isFinite(n) && n >= PROPS_W_MIN) {
+        applyPropsWidth(n);
+        return;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  // leave CSS default unless user has resized before
+  document.documentElement.removeAttribute("data-props-resized");
+}
+
+function resetPropsWidth() {
+  try {
+    localStorage.removeItem(PROPS_W_KEY);
+  } catch {
+    /* ignore */
+  }
+  document.documentElement.style.removeProperty("--props-w");
+  document.documentElement.removeAttribute("data-props-resized");
+  setStatus(`Properties width reset (${PROPS_W_DEFAULT}px)`);
+}
+
+function bindPropsResize() {
+  loadPropsWidth();
+  const handle = $("#props-resize-handle");
+  const panel = $("#props-panel");
+  if (!handle || !panel) return;
+
+  let dragging = false;
+  let startX = 0;
+  let startW = 0;
+
+  handle.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    // On stacked mobile layout, resize is hidden — still guard
+    if (window.matchMedia("(max-width: 900px)").matches) return;
+    dragging = true;
+    startX = e.clientX;
+    const computed = getComputedStyle(document.documentElement)
+      .getPropertyValue("--props-w")
+      .trim();
+    startW = parseFloat(computed) || PROPS_W_DEFAULT;
+    panel.classList.add("is-resizing");
+    document.body.classList.add("props-resizing");
+    handle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+
+  handle.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    // Dragging left edge: moving pointer left → wider panel
+    const dx = startX - e.clientX;
+    applyPropsWidth(startW + dx);
+  });
+
+  const endDrag = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    panel.classList.remove("is-resizing");
+    document.body.classList.remove("props-resizing");
+    try {
+      handle.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    const computed = getComputedStyle(document.documentElement)
+      .getPropertyValue("--props-w")
+      .trim();
+    const w = applyPropsWidth(parseFloat(computed) || PROPS_W_DEFAULT, {
+      persist: true,
+    });
+    setStatus(`Properties width: ${w}px`);
+  };
+
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
+
+  handle.addEventListener("dblclick", (e) => {
+    e.preventDefault();
+    resetPropsWidth();
+  });
+
+  // Keep width within max if window shrinks
+  window.addEventListener("resize", () => {
+    if (!document.documentElement.hasAttribute("data-props-resized")) return;
+    const computed = getComputedStyle(document.documentElement)
+      .getPropertyValue("--props-w")
+      .trim();
+    const n = parseFloat(computed);
+    if (Number.isFinite(n)) applyPropsWidth(n, { persist: true });
+  });
 }
 
 function bindWireListUi() {
@@ -3400,6 +3524,7 @@ function bindUI() {
   bindGitHubSettingsModal();
   bindLandingsUi();
   bindWireListUi();
+  bindPropsResize();
   updateGitHubBadge();
   $("#btn-import").addEventListener("click", () => fileImport.click());
   fileImport.addEventListener("change", () => {

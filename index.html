@@ -199,8 +199,16 @@
         </div>
       </main>
 
-      <!-- Right properties -->
-      <aside class="props panel">
+      <!-- Right properties (drag left edge to resize) -->
+      <aside class="props panel" id="props-panel">
+        <div
+          class="props-resize-handle"
+          id="props-resize-handle"
+          title="Drag to resize properties panel · double-click to reset"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize properties panel"
+        ></div>
         <div class="props-scroll">
           <h2>Properties</h2>
           <div id="props-empty" class="props-empty">

@@ -31,7 +31,9 @@
   --landing-h-mid: min(42vh, 440px);
   --landing-h-tall: min(72vh, 720px);
   --palette-w: 260px;
-  --props-w: 320px;
+  --props-w: 360px; /* default; user can drag the props left edge wider */
+  --props-w-min: 280px;
+  --props-w-max: min(720px, 55vw);
 }
 
 *,
@@ -465,6 +467,7 @@ button {
 }
 
 .props {
+  position: relative;
   border-left: 1px solid var(--border);
   padding: 0;
   display: flex;
@@ -472,13 +475,53 @@ button {
   gap: 0;
   min-height: 0;
   overflow: hidden;
+  min-width: 0;
+}
+
+/* Vertical drag edge — left side of properties slide */
+.props-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  cursor: ew-resize;
+  z-index: 6;
+  touch-action: none;
+}
+
+.props-resize-handle::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 48px;
+  border-radius: 99px;
+  background: var(--border-strong);
+  opacity: 0.85;
+  transition: background 0.12s, opacity 0.12s, height 0.12s;
+}
+
+.props-resize-handle:hover::after,
+.props.is-resizing .props-resize-handle::after {
+  background: var(--accent);
+  opacity: 1;
+  height: 64px;
+}
+
+body.props-resizing,
+body.props-resizing * {
+  cursor: ew-resize !important;
+  user-select: none !important;
 }
 
 .props-scroll {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 14px 12px 10px;
+  padding: 14px 12px 10px 16px; /* extra left for resize grip */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1619,14 +1662,36 @@ button {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  /* room for focus rings */
+  margin-inline: -2px;
+  padding-inline: 2px;
 }
 
 .conductor-row {
   display: grid;
-  grid-template-columns: 28px 1fr 70px 1fr 1fr;
+  /* Label / Color / From / To get real minimum widths; scroll if panel is narrow */
+  grid-template-columns:
+    22px
+    minmax(72px, 1.25fr)
+    minmax(64px, 88px)
+    minmax(88px, 1fr)
+    minmax(88px, 1fr);
   gap: 6px;
   align-items: center;
   font-size: 11px;
+  min-width: 400px;
+}
+
+.conductor-row.conductor-row-head {
+  min-height: 18px;
+  font-size: 9px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  user-select: none;
+  pointer-events: none;
 }
 
 .conductor-row .c-num {
@@ -1635,12 +1700,61 @@ button {
   text-align: center;
 }
 
+.conductor-row input,
 .conductor-row select {
-  padding: 4px 6px;
+  min-width: 0;
+  width: 100%;
+  padding: 6px 7px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 11px;
+}
+
+.conductor-row input:focus,
+.conductor-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+/* Wider props panel → more breathing room for conductor editor */
+@supports (container-type: inline-size) {
+  .props {
+    container-type: inline-size;
+    container-name: props;
+  }
+
+  @container props (min-width: 440px) {
+    .conductor-row {
+      grid-template-columns:
+        28px
+        minmax(100px, 1.4fr)
+        minmax(72px, 100px)
+        minmax(110px, 1fr)
+        minmax(110px, 1fr);
+      gap: 8px;
+      min-width: 0;
+    }
+  }
+
+  @container props (min-width: 560px) {
+    .conductor-row {
+      grid-template-columns:
+        32px
+        minmax(120px, 1.5fr)
+        minmax(88px, 120px)
+        minmax(130px, 1fr)
+        minmax(130px, 1fr);
+      gap: 10px;
+    }
+
+    .conductor-row input,
+    .conductor-row select {
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+  }
 }
 
 /* ── Landing drawer ── */
@@ -2263,7 +2377,10 @@ button {
 @media (max-width: 1100px) {
   :root {
     --palette-w: 220px;
-    --props-w: 280px;
+  }
+  /* Keep user --props-w if set; only fall back when not customized */
+  :root:not([data-props-resized]) {
+    --props-w: 300px;
   }
 }
 
@@ -2283,5 +2400,9 @@ button {
   .props {
     border-bottom: none;
     border-top: 1px solid var(--border);
+  }
+
+  .props-resize-handle {
+    display: none;
   }
 }
