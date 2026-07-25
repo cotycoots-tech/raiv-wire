@@ -107,7 +107,15 @@ export function findTerminalAt(nodes, worldX, worldY, hitR = 12) {
       const d = Math.hypot(p.x - worldX, p.y - worldY);
       if (d < bestD) {
         bestD = d;
-        best = { nodeId: node.id, terminalId: p.terminal.id, x: p.x, y: p.y, node, terminal: p.terminal };
+        best = {
+          nodeId: node.id,
+          terminalId: p.terminal.id,
+          x: p.x,
+          y: p.y,
+          side: p.side,
+          node,
+          terminal: p.terminal,
+        };
       }
     }
   }
@@ -130,6 +138,28 @@ export function findNodeAt(nodes, worldX, worldY) {
   return null;
 }
 
+/** Straight exit length from a terminal before any route bend (world units). */
+export const CABLE_EXIT_STUB = 24;
+
+/**
+ * Point a fixed offset outward from a terminal, away from the device body.
+ * side: "left" | "right" | "bottom" | "top"
+ */
+export function exitStubPoint(x, y, side, length = CABLE_EXIT_STUB) {
+  switch (side) {
+    case "left":
+      return { x: x - length, y };
+    case "right":
+      return { x: x + length, y };
+    case "bottom":
+      return { x, y: y + length };
+    case "top":
+      return { x, y: y - length };
+    default:
+      return { x, y };
+  }
+}
+
 export function cableEndpoints(cable, nodes) {
   const fromNode = nodes.find((n) => n.id === cable.from.nodeId);
   const toNode = nodes.find((n) => n.id === cable.to.nodeId);
@@ -140,46 +170,66 @@ export function cableEndpoints(cable, nodes) {
   const fp = fromPins.find((p) => p.terminal.id === cable.from.terminalId) || fromPins[0];
   const tp = toPins.find((p) => p.terminal.id === cable.to.terminalId) || toPins[0];
   if (!fp || !tp) return null;
-  return { x1: fp.x, y1: fp.y, x2: tp.x, y2: tp.y };
+  return {
+    x1: fp.x,
+    y1: fp.y,
+    x2: tp.x,
+    y2: tp.y,
+    side1: fp.side,
+    side2: tp.side,
+  };
 }
 
 /**
- * Resolve cable route control point.
+ * Resolve cable route control point (between exit stubs).
  * route: { midX, midY } — orthog path elbows (click-drag to adjust layout)
  */
 export function getCableRouteHandle(cable, ep) {
   if (!ep) return null;
   const r = cable.route || {};
+  const s1 = exitStubPoint(ep.x1, ep.y1, ep.side1);
+  const s2 = exitStubPoint(ep.x2, ep.y2, ep.side2);
   const midX =
     typeof r.midX === "number" && Number.isFinite(r.midX)
       ? r.midX
-      : (ep.x1 + ep.x2) / 2;
+      : (s1.x + s2.x) / 2;
   const midY =
     typeof r.midY === "number" && Number.isFinite(r.midY)
       ? r.midY
-      : (ep.y1 + ep.y2) / 2;
+      : (s1.y + s2.y) / 2;
   return { midX, midY };
 }
 
 /**
- * Orthogonal cable path with adjustable elbows:
- * start → H to midX → V to midY → H to x2 → V to end
- * Degenerates cleanly when midX/midY align with defaults.
+ * Orthogonal cable path with fixed terminal exit stubs, then adjustable elbows:
+ * pin1 → stub1 → H to midX → V to midY → H to stub2.x → V to stub2 → pin2
+ * Stubs always leave the device first; bends only happen after the preset offset.
  */
 export function cablePathD(ep, handle, yOffset = 0) {
   const x1 = ep.x1;
   const y1 = ep.y1 + yOffset;
   const x2 = ep.x2;
   const y2 = ep.y2 + yOffset;
-  const mx = handle?.midX ?? (x1 + x2) / 2;
-  const my = (handle?.midY ?? (ep.y1 + ep.y2) / 2) + yOffset;
-  return `M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${my} L ${x2} ${my} L ${x2} ${y2}`;
+  const s1 = exitStubPoint(x1, y1, ep.side1);
+  const s2 = exitStubPoint(x2, y2, ep.side2);
+  const mx = handle?.midX ?? (s1.x + s2.x) / 2;
+  const my = (handle?.midY ?? (s1.y + s2.y) / 2) + (handle?.midY != null ? yOffset : 0);
+  // pin → exit stub → mid channel → far stub → pin
+  return (
+    `M ${x1} ${y1}` +
+    ` L ${s1.x} ${s1.y}` +
+    ` L ${mx} ${s1.y}` +
+    ` L ${mx} ${my}` +
+    ` L ${s2.x} ${my}` +
+    ` L ${s2.x} ${s2.y}` +
+    ` L ${x2} ${y2}`
+  );
 }
 
-function orthogonalPath(x1, y1, x2, y2) {
+function orthogonalPath(x1, y1, x2, y2, side1 = "right", side2 = "left") {
   const mx = (x1 + x2) / 2;
   return cablePathD(
-    { x1, y1, x2, y2 },
+    { x1, y1, x2, y2, side1, side2 },
     { midX: mx, midY: (y1 + y2) / 2 },
     0
   );
@@ -191,13 +241,14 @@ function primaryCableColor(cable) {
   return colorById(first.color).stroke;
 }
 
-/** Label position along routed path */
+/** Label position along routed path (near mid channel, past exit stubs) */
 function cableLabelPoint(ep, handle) {
   const h = handle || getCableRouteHandle({ route: null }, ep);
+  const s1 = exitStubPoint(ep.x1, ep.y1, ep.side1);
+  const s2 = exitStubPoint(ep.x2, ep.y2, ep.side2);
   return {
-    x: (ep.x1 + ep.x2) / 2,
-    // sit near the horizontal mid segment
-    y: (h.midY ?? (ep.y1 + ep.y2) / 2) - 10,
+    x: (s1.x + s2.x) / 2,
+    y: (h.midY ?? (s1.y + s2.y) / 2) - 10,
   };
 }
 
@@ -513,10 +564,19 @@ export function renderDiagram(layers, project, selection, hoverTerm) {
 export function renderCablePreview(overlay, from, toWorld) {
   overlay.innerHTML = "";
   if (!from || !toWorld) return;
-  const ep = { x1: from.x, y1: from.y, x2: toWorld.x, y2: toWorld.y };
+  const side1 = from.side || null;
+  const s1 = exitStubPoint(from.x, from.y, side1);
+  const ep = {
+    x1: from.x,
+    y1: from.y,
+    x2: toWorld.x,
+    y2: toWorld.y,
+    side1,
+    side2: null, // free end — no stub until landed
+  };
   const handle = {
-    midX: (from.x + toWorld.x) / 2,
-    midY: (from.y + toWorld.y) / 2,
+    midX: (s1.x + toWorld.x) / 2,
+    midY: (s1.y + toWorld.y) / 2,
   };
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", cablePathD(ep, handle, 0));
@@ -545,10 +605,11 @@ export function contentBounds(project, padding = 40) {
     maxX = Math.max(maxX, n.x + n.width);
     maxY = Math.max(maxY, n.y + n.height);
     for (const p of getTerminalPositions(n)) {
-      minX = Math.min(minX, p.x - 12);
-      minY = Math.min(minY, p.y - 12);
-      maxX = Math.max(maxX, p.x + 12);
-      maxY = Math.max(maxY, p.y + 12);
+      const pad = CABLE_EXIT_STUB + 8;
+      minX = Math.min(minX, p.x - pad);
+      minY = Math.min(minY, p.y - pad);
+      maxX = Math.max(maxX, p.x + pad);
+      maxY = Math.max(maxY, p.y + pad);
     }
   }
   minX -= padding;

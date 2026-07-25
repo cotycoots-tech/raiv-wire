@@ -1086,7 +1086,7 @@ function cablePropsHtml(cable) {
     </div>
     <div class="field">
       <label>Route layout</label>
-      <p class="hint" style="margin:0 0 6px">Click-hold and drag the cable (or blue handle) on the canvas to bend the path.</p>
+      <p class="hint" style="margin:0 0 6px">Cables stub out from terminals first, then bend. Click-hold and drag the cable (or blue handle) to adjust the mid route.</p>
       <button type="button" class="btn-secondary" id="cf-reset-route">Reset cable route</button>
     </div>
     <div class="field">
@@ -1769,6 +1769,7 @@ function onPointerDown(e) {
           terminalId: termHit.terminalId,
           x: termHit.x,
           y: termHit.y,
+          side: termHit.side,
         };
         state.selection = {
           type: "cable-end",
@@ -1832,6 +1833,7 @@ function onPointerDown(e) {
       terminalId: termHit.terminalId,
       x: termHit.x,
       y: termHit.y,
+      side: termHit.side,
     };
     setTool("cable");
     state.selection = {
