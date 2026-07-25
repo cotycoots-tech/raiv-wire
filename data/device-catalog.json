@@ -1,7 +1,7 @@
 {
   "version": 1,
   "type": "raiv-wire-device-catalog",
-  "exportedAt": "2026-07-25T02:16:31.036Z",
+  "exportedAt": "2026-07-25T09:37:06.118Z",
   "items": [
     {
       "id": "seed_plc_s7",
@@ -435,7 +435,7 @@
       "inventoryGroup": "operator",
       "baseType": "pushbutton",
       "tagPrefix": "PB",
-      "name": "Fuji/ Mom.LED",
+      "name": "Fuji flush PB mom LED",
       "manufacturer": "Fuji Electric",
       "partNumber": "AR22F0R-10E3S",
       "description": "22 mm flush momentary pushbutton, 24 V DC LED, NO contact block",
@@ -443,27 +443,22 @@
       "height": 75,
       "terminals": [
         {
-          "id": "-3",
+          "id": "NO1",
           "name": "NO 3"
         },
         {
-          "id": "-4",
+          "id": "NO2",
           "name": "NO 4"
         },
         {
-          "id": "-X1",
+          "id": "LED+",
           "name": "LED +24V X1"
         },
         {
-          "id": "-X2",
+          "id": "LED-",
           "name": "LED 0V X2"
         }
-      ],
-      "mateCoding": "",
-      "matePins": 0,
-      "mateFace": "",
-      "category": "device",
-      "createdAt": "2026-07-25T02:12:43.409Z"
+      ]
     },
     {
       "id": "seed_fuji_pb_mom_led_24v_ext",
