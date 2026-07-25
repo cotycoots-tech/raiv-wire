@@ -1,7 +1,7 @@
 {
   "type": "raiv-wire-projects-library",
   "version": 1,
-  "savedAt": "2026-07-24T20:49:12.494Z",
+  "savedAt": "2026-07-25T01:48:16.789Z",
   "activeId": "proj_mrz5jajb_2",
   "projects": {
     "proj_mrz5jajb_2": {
@@ -9,7 +9,7 @@
       "id": "proj_mrz5jajb_2",
       "name": "Demo Build",
       "createdAt": "2026-07-24T16:25:47.543Z",
-      "updatedAt": "2026-07-24T20:49:12.479Z",
+      "updatedAt": "2026-07-25T01:48:16.788Z",
       "nodes": [
         {
           "id": "node_mrz5jajb_3",
@@ -406,6 +406,109 @@
           "matePins": 0,
           "mateFace": "",
           "isBulkhead": false
+        },
+        {
+          "id": "node_mrzowu6l_3",
+          "type": "plc",
+          "category": "device",
+          "tag": "PLC2",
+          "name": "CLICK C0-10DD2E-D",
+          "description": "CLICK Plus PLC — 8 DC inputs, 6 DC sinking outputs, Ethernet. Stackable I/O option.",
+          "x": 74,
+          "y": 405,
+          "width": 150,
+          "height": 120,
+          "terminals": [
+            {
+              "id": "+V",
+              "name": "+24V DC power"
+            },
+            {
+              "id": "0V",
+              "name": "0V / DC common"
+            },
+            {
+              "id": "FG",
+              "name": "FG / PE"
+            },
+            {
+              "id": "ETH",
+              "name": "Ethernet"
+            },
+            {
+              "id": "X1",
+              "name": "X1 DI"
+            },
+            {
+              "id": "X2",
+              "name": "X2 DI"
+            },
+            {
+              "id": "X3",
+              "name": "X3 DI"
+            },
+            {
+              "id": "X4",
+              "name": "X4 DI"
+            },
+            {
+              "id": "X5",
+              "name": "X5 DI"
+            },
+            {
+              "id": "X6",
+              "name": "X6 DI"
+            },
+            {
+              "id": "X7",
+              "name": "X7 DI"
+            },
+            {
+              "id": "X8",
+              "name": "X8 DI"
+            },
+            {
+              "id": "C0",
+              "name": "Input common C0"
+            },
+            {
+              "id": "Y1",
+              "name": "Y1 DO sink"
+            },
+            {
+              "id": "Y2",
+              "name": "Y2 DO sink"
+            },
+            {
+              "id": "Y3",
+              "name": "Y3 DO sink"
+            },
+            {
+              "id": "Y4",
+              "name": "Y4 DO sink"
+            },
+            {
+              "id": "Y5",
+              "name": "Y5 DO sink"
+            },
+            {
+              "id": "Y6",
+              "name": "Y6 DO sink"
+            },
+            {
+              "id": "C1",
+              "name": "Output common C1"
+            }
+          ],
+          "location": "",
+          "manufacturer": "AutomationDirect / CLICK",
+          "partNumber": "C0-10DD2E-D",
+          "catalogId": "seed_click_c0_10dd2e_d",
+          "catalogName": "CLICK PLC C0-10DD2E-D",
+          "mateCoding": "",
+          "matePins": 0,
+          "mateFace": "",
+          "isBulkhead": false
         }
       ],
       "cables": [
@@ -660,7 +763,7 @@
       ],
       "view": {
         "x": -7.362428726688508,
-        "y": 144.68125595584993,
+        "y": 189.31598011139903,
         "scale": 0.9203035908360635
       },
       "meta": {
