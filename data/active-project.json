@@ -1,1 +1,16 @@
-PLACEHOLDER_ACTIVE
+{
+  "type": "raiv-wire-active-project",
+  "version": 1,
+  "savedAt": "2026-09-08T10:21:40.000Z",
+  "project": {
+    "version": 1,
+    "id": "proj_raiv_t3_001",
+    "name": "Raiv-T3",
+    "createdAt": "2026-09-08T10:11:28.000Z",
+    "updatedAt": "2026-09-08T10:21:40.000Z",
+    "nodes": [],
+    "cables": [],
+    "view": { "x": 80, "y": 40, "scale": 0.72 },
+    "meta": { "drawingNumber": "WD-RAIV-T3-001", "revision": "C", "notes": "Pull data/projects-library.json for full nodes. Import artifacts if canvas is empty." }
+  }
+}
