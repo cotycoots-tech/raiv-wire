@@ -1,16 +1,3545 @@
 {
   "type": "raiv-wire-active-project",
   "version": 1,
-  "savedAt": "2026-09-08T10:21:40.000Z",
+  "savedAt": "2026-09-08T10:31:21.068Z",
   "project": {
     "version": 1,
-    "id": "proj_raiv_t3_001",
-    "name": "Raiv-T3",
+    "id": "proj_mtsj3rlm_3",
+    "name": "Demo Build",
     "createdAt": "2026-09-08T10:11:28.000Z",
-    "updatedAt": "2026-09-08T10:21:40.000Z",
-    "nodes": [],
-    "cables": [],
-    "view": { "x": 80, "y": 40, "scale": 0.72 },
-    "meta": { "drawingNumber": "WD-RAIV-T3-001", "revision": "C", "notes": "Pull data/projects-library.json for full nodes. Import artifacts if canvas is empty." }
+    "updatedAt": "2026-09-08T10:31:21.051Z",
+    "nodes": [
+      {
+        "id": "n_cs9",
+        "type": "plc",
+        "category": "device",
+        "tag": "CS9",
+        "name": "CS9 F-24-0064095-C-002",
+        "description": "PlateSorter autoStart. EtherCAT J206 3-slice D24403. T3 Q0–Q3 = T2 safety-stop names (no C-10 home).",
+        "x": 40,
+        "y": 60,
+        "width": 200,
+        "height": 220,
+        "terminals": [
+          {
+            "id": "L+",
+            "name": "+24V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "M",
+            "name": "0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1I0",
+            "name": "T1 I0  Enable PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1I1",
+            "name": "T1 I1  Disable1 PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1I2",
+            "name": "T1 I2  Disable2 PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1I3",
+            "name": "T1 I3  Door",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1Q0",
+            "name": "T1 Q0  Warmup / isPowered",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1Q1",
+            "name": "T1 Q1  Enable lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1Q2",
+            "name": "T1 Q2  Disable1 lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T1Q3",
+            "name": "T1 Q3  Disable2 lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2I2",
+            "name": "T2 I2  Abort/Stow",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2I3",
+            "name": "T2 I3  Cycle",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2I4",
+            "name": "T2 I4  Speed",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2I5",
+            "name": "T2 I5  Belt FWD PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2I6",
+            "name": "T2 I6  Belt REV PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2I7",
+            "name": "T2 I7  ClearPose",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q1",
+            "name": "T2 Q1  Disable lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q2",
+            "name": "T2 Q2  Abort lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q3",
+            "name": "T2 Q3  Cycle lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q4",
+            "name": "T2 Q4  Speed lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q5",
+            "name": "T2 Q5  Belt FWD lamp/sol",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q6",
+            "name": "T2 Q6  Belt REV",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T2Q7",
+            "name": "T2 Q7  ClearPose lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3I0",
+            "name": "T3 I0  Gripper lock PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q0",
+            "name": "T3 Q0  SafetyStop None",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q1",
+            "name": "T3 Q1  SafetyStop Waiting",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q2",
+            "name": "T3 Q2  SafetyStop SS1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q3",
+            "name": "T3 Q3  SafetyStop SS2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q5",
+            "name": "T3 Q5  Gripper Enable",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q6",
+            "name": "T3 Q6  Mag",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q7",
+            "name": "T3 Q7  Demag",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "T3Q4",
+            "name": "T3 Q4  GripperLocked lamp",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Controller cabinet",
+        "manufacturer": "Stäubli",
+        "partNumber": "CS9 / F-24-0064095-C-002",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_jb02",
+        "type": "jbox",
+        "category": "jbox",
+        "tag": "JB-02",
+        "name": "JB-02 Stand-01",
+        "description": "Stand junction. C-10 25c lands TB7–TB10. Field drops C-01–C-09 leave here. C-11 R23 feed starts here.",
+        "x": 360,
+        "y": 80,
+        "width": 180,
+        "height": 200,
+        "terminals": [
+          {
+            "id": "TB3-1",
+            "name": "TB3-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-2",
+            "name": "TB3-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-3",
+            "name": "TB3-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-4",
+            "name": "TB3-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-5",
+            "name": "TB3-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-6",
+            "name": "TB3-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-7",
+            "name": "TB3-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-8",
+            "name": "TB3-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-9",
+            "name": "TB3-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB3-10",
+            "name": "TB3-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-1",
+            "name": "TB4-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-2",
+            "name": "TB4-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-3",
+            "name": "TB4-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-4",
+            "name": "TB4-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-5",
+            "name": "TB4-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-6",
+            "name": "TB4-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-7",
+            "name": "TB4-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-8",
+            "name": "TB4-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-9",
+            "name": "TB4-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB4-10",
+            "name": "TB4-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-1",
+            "name": "TB5-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-2",
+            "name": "TB5-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-3",
+            "name": "TB5-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-4",
+            "name": "TB5-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-5",
+            "name": "TB5-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-6",
+            "name": "TB5-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-7",
+            "name": "TB5-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-8",
+            "name": "TB5-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-9",
+            "name": "TB5-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-10",
+            "name": "TB5-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-1",
+            "name": "TB6-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-2",
+            "name": "TB6-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-3",
+            "name": "TB6-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-4",
+            "name": "TB6-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-5",
+            "name": "TB6-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-6",
+            "name": "TB6-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-7",
+            "name": "TB6-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-8",
+            "name": "TB6-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-9",
+            "name": "TB6-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-10",
+            "name": "TB6-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-1",
+            "name": "TB7-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-2",
+            "name": "TB7-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-3",
+            "name": "TB7-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-4",
+            "name": "TB7-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-5",
+            "name": "TB7-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-6",
+            "name": "TB7-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-7",
+            "name": "TB7-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-8",
+            "name": "TB7-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-9",
+            "name": "TB7-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB7-10",
+            "name": "TB7-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-1",
+            "name": "TB8-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-2",
+            "name": "TB8-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-3",
+            "name": "TB8-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-4",
+            "name": "TB8-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-5",
+            "name": "TB8-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-6",
+            "name": "TB8-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-7",
+            "name": "TB8-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-8",
+            "name": "TB8-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-9",
+            "name": "TB8-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB8-10",
+            "name": "TB8-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-1",
+            "name": "TB9-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-2",
+            "name": "TB9-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-3",
+            "name": "TB9-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-4",
+            "name": "TB9-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-5",
+            "name": "TB9-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-6",
+            "name": "TB9-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-7",
+            "name": "TB9-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-8",
+            "name": "TB9-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-9",
+            "name": "TB9-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB9-10",
+            "name": "TB9-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-1",
+            "name": "TB10-1",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-2",
+            "name": "TB10-2",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-3",
+            "name": "TB10-3",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-4",
+            "name": "TB10-4",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-5",
+            "name": "TB10-5",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-6",
+            "name": "TB10-6",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-7",
+            "name": "TB10-7",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-8",
+            "name": "TB10-8",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-9",
+            "name": "TB10-9",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-10",
+            "name": "TB10-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-01",
+            "name": "C-11 P-01 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-02",
+            "name": "C-11 P-02 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-03",
+            "name": "C-11 P-03 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-04",
+            "name": "C-11 P-04 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-05",
+            "name": "C-11 P-05 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-06",
+            "name": "C-11 P-06 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-07",
+            "name": "C-11 P-07 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-10",
+            "name": "C-11 P-10 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-11",
+            "name": "C-11 P-11 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-12",
+            "name": "C-11 P-12 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-15",
+            "name": "C-11 P-15 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-16",
+            "name": "C-11 P-16 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-17",
+            "name": "C-11 P-17 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-18",
+            "name": "C-11 P-18 unassigned",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PARK-19",
+            "name": "C-11 P-19 unassigned",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Stand-01",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_jb03",
+        "type": "jbox",
+        "category": "jbox",
+        "tag": "JB-03",
+        "name": "JB-03 Robot ForeArm / J4",
+        "description": "Forearm dress box. R23-19 from C-11. J4 bulkheads feed C-12 M12-8 logic and C-13 M12-4 power to EMH84.",
+        "x": 680,
+        "y": 80,
+        "width": 180,
+        "height": 200,
+        "terminals": [
+          {
+            "id": "R23-01",
+            "name": "R23 P-01",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-02",
+            "name": "R23 P-02",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-03",
+            "name": "R23 P-03",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-04",
+            "name": "R23 P-04",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-05",
+            "name": "R23 P-05",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-06",
+            "name": "R23 P-06",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-07",
+            "name": "R23 P-07",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-08",
+            "name": "R23 P-08",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-09",
+            "name": "R23 P-09",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-10",
+            "name": "R23 P-10",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-11",
+            "name": "R23 P-11",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-12",
+            "name": "R23 P-12",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-13",
+            "name": "R23 P-13",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-14",
+            "name": "R23 P-14",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-15",
+            "name": "R23 P-15",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-16",
+            "name": "R23 P-16",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-17",
+            "name": "R23 P-17",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-18",
+            "name": "R23 P-18",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "R23-19",
+            "name": "R23 P-19",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-1",
+            "name": "J4 M12-8 P1 Mag WH",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-2",
+            "name": "J4 M12-8 P2 Demag BN",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-3",
+            "name": "J4 M12-8 P3 0V GN",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-4",
+            "name": "J4 M12-8 P4 YE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-5",
+            "name": "J4 M12-8 P5 GY",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-6",
+            "name": "J4 M12-8 P6 PK",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-7",
+            "name": "J4 M12-8 P7 BU",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-8-8",
+            "name": "J4 M12-8 P8 RD",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-4-1",
+            "name": "J4 M12-4 P1 +24 BN",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-4-2",
+            "name": "J4 M12-4 P2 0V WH",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-4-3",
+            "name": "J4 M12-4 P3 0V BU",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "J4-4-4",
+            "name": "J4 M12-4 P4 +24 BK",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "TX2 forearm / J4",
+        "manufacturer": "Stäubli",
+        "partNumber": "R23-19",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_j4_8",
+        "type": "m12-8-bulkhead",
+        "category": "connector",
+        "tag": "J4-M12-8",
+        "name": "J4 M12-8 EMH logic",
+        "description": "IEC option 1 M12-8. P-01 White Mag, P-02 Brown Demag.",
+        "x": 940,
+        "y": 20,
+        "width": 110,
+        "height": 120,
+        "terminals": [
+          {
+            "id": "F1",
+            "name": "F1 Mag WH",
+            "matePin": "1",
+            "side": "field"
+          },
+          {
+            "id": "F2",
+            "name": "F2 Demag BN",
+            "matePin": "2",
+            "side": "field"
+          },
+          {
+            "id": "F3",
+            "name": "F3 0V GN",
+            "matePin": "3",
+            "side": "field"
+          },
+          {
+            "id": "F4",
+            "name": "F4 YE",
+            "matePin": "4",
+            "side": "field"
+          },
+          {
+            "id": "F5",
+            "name": "F5 GY",
+            "matePin": "5",
+            "side": "field"
+          },
+          {
+            "id": "F6",
+            "name": "F6 PK",
+            "matePin": "6",
+            "side": "field"
+          },
+          {
+            "id": "F7",
+            "name": "F7 BU",
+            "matePin": "7",
+            "side": "field"
+          },
+          {
+            "id": "F8",
+            "name": "F8 RD",
+            "matePin": "8",
+            "side": "field"
+          },
+          {
+            "id": "P1",
+            "name": "P1 Mag",
+            "matePin": "1",
+            "side": "panel"
+          },
+          {
+            "id": "P2",
+            "name": "P2 Demag",
+            "matePin": "2",
+            "side": "panel"
+          },
+          {
+            "id": "P3",
+            "name": "P3 0V",
+            "matePin": "3",
+            "side": "panel"
+          },
+          {
+            "id": "P4",
+            "name": "P4",
+            "matePin": "4",
+            "side": "panel"
+          },
+          {
+            "id": "P5",
+            "name": "P5",
+            "matePin": "5",
+            "side": "panel"
+          },
+          {
+            "id": "P6",
+            "name": "P6",
+            "matePin": "6",
+            "side": "panel"
+          },
+          {
+            "id": "P7",
+            "name": "P7",
+            "matePin": "7",
+            "side": "panel"
+          },
+          {
+            "id": "P8",
+            "name": "P8",
+            "matePin": "8",
+            "side": "panel"
+          }
+        ],
+        "location": "J4 flange",
+        "manufacturer": "",
+        "partNumber": "M12-8",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": true
+      },
+      {
+        "id": "n_j4_4",
+        "type": "m12-4-bulkhead",
+        "category": "connector",
+        "tag": "J4-M12-4",
+        "name": "J4 M12-4 EMH power",
+        "description": "M12-4 power to EMH84. P1/P4 +24, P2/P3 0V.",
+        "x": 940,
+        "y": 180,
+        "width": 110,
+        "height": 100,
+        "terminals": [
+          {
+            "id": "F1",
+            "name": "F1 +24 BN",
+            "matePin": "1",
+            "side": "field"
+          },
+          {
+            "id": "F2",
+            "name": "F2 0V WH",
+            "matePin": "2",
+            "side": "field"
+          },
+          {
+            "id": "F3",
+            "name": "F3 0V BU",
+            "matePin": "3",
+            "side": "field"
+          },
+          {
+            "id": "F4",
+            "name": "F4 +24 BK",
+            "matePin": "4",
+            "side": "field"
+          },
+          {
+            "id": "P1",
+            "name": "P1 +24",
+            "matePin": "1",
+            "side": "panel"
+          },
+          {
+            "id": "P2",
+            "name": "P2 0V",
+            "matePin": "2",
+            "side": "panel"
+          },
+          {
+            "id": "P3",
+            "name": "P3 0V",
+            "matePin": "3",
+            "side": "panel"
+          },
+          {
+            "id": "P4",
+            "name": "P4 +24",
+            "matePin": "4",
+            "side": "panel"
+          }
+        ],
+        "location": "J4 flange",
+        "manufacturer": "",
+        "partNumber": "M12-4",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": true
+      },
+      {
+        "id": "n_emh",
+        "type": "sensor",
+        "category": "device",
+        "tag": "EAOT-01",
+        "name": "EAOT-01-EMH84",
+        "description": "Electromagnet gripper. Mag = C-12 P-01 White. Demag = C-12 P-02 Brown. Status returns have no C-10 home.",
+        "x": 1160,
+        "y": 80,
+        "width": 130,
+        "height": 110,
+        "terminals": [
+          {
+            "id": "MAG",
+            "name": "Mag / P-01 White",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "DEMAG",
+            "name": "Demag / P-02 Brown",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "GND",
+            "name": "0V / P-03 Green",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P1",
+            "name": "+24 power",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P2",
+            "name": "0V power",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "YE",
+            "name": "P-04 Yellow open",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "GY",
+            "name": "P-05 Grey open",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PK",
+            "name": "P-06 Pink open",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "BU",
+            "name": "P-07 Blue open",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "RD",
+            "name": "P-08 Red open",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Tool flange",
+        "manufacturer": "EMH",
+        "partNumber": "EMH84",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_pbs01",
+        "type": "pushbutton",
+        "category": "device",
+        "tag": "PBS-01",
+        "name": "PBS-01 Maintenance",
+        "description": "C-01 M12-12 from JB-02.",
+        "x": 200,
+        "y": 360,
+        "width": 110,
+        "height": 80,
+        "terminals": [
+          {
+            "id": "NO1",
+            "name": "NO",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "NC1",
+            "name": "NC",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "COM",
+            "name": "COM",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L+",
+            "name": "Lamp +",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L-",
+            "name": "Lamp −",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB1-1",
+            "name": "TB1-1",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Maintenance station",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_pbs02",
+        "type": "pushbutton",
+        "category": "device",
+        "tag": "PBS-02",
+        "name": "PBS-02 Operation",
+        "description": "C-02 M12-12 from JB-02.",
+        "x": 360,
+        "y": 360,
+        "width": 110,
+        "height": 80,
+        "terminals": [
+          {
+            "id": "NO1",
+            "name": "NO",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "NC1",
+            "name": "NC",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "COM",
+            "name": "COM",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L+",
+            "name": "Lamp +",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L-",
+            "name": "Lamp −",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB2-1",
+            "name": "TB2-1",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Operation station",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_pbs03",
+        "type": "pushbutton",
+        "category": "device",
+        "tag": "PBS-03",
+        "name": "PBS-03 Servo-01",
+        "description": "C-03 M12-8 from JB-02. C-14 HMI leaves here.",
+        "x": 520,
+        "y": 360,
+        "width": 120,
+        "height": 90,
+        "terminals": [
+          {
+            "id": "NO1",
+            "name": "NO",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "NC1",
+            "name": "NC",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "COM",
+            "name": "COM",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L+",
+            "name": "Lamp +",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L-",
+            "name": "Lamp −",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-3",
+            "name": "TB5-3 +24",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-4",
+            "name": "TB5-4 Enable PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB5-X1",
+            "name": "TB5-X1 Enable lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-X1",
+            "name": "TB6-X1 Dis1 lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-X2",
+            "name": "TB6-X2 0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB6-2",
+            "name": "TB6-2 Disable1 PB",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Servo-01",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_pbs04",
+        "type": "pushbutton",
+        "category": "device",
+        "tag": "PBS-04",
+        "name": "PBS-04 Servo-02",
+        "description": "C-04 M12-8 from JB-02. C-15 strobe leaves here.",
+        "x": 680,
+        "y": 360,
+        "width": 120,
+        "height": 90,
+        "terminals": [
+          {
+            "id": "NO1",
+            "name": "NO",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "NC1",
+            "name": "NC",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "COM",
+            "name": "COM",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L+",
+            "name": "Lamp +",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "L-",
+            "name": "Lamp −",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-1",
+            "name": "TB10-1 +24",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-2",
+            "name": "TB10-2 Enable PB",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-X1",
+            "name": "TB10-X1 Enable lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB11-X1",
+            "name": "TB11-X1 Dis2 lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB10-X2",
+            "name": "TB10-X2 0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "TB11-2",
+            "name": "TB11-2 Disable2 PB",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Servo-02",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_hmi",
+        "type": "hmi",
+        "category": "device",
+        "tag": "HMI-02",
+        "name": "JB-03-HMI-02",
+        "description": "Old C-12 jacket, now C-14. Confirm still present on machine.",
+        "x": 860,
+        "y": 360,
+        "width": 110,
+        "height": 80,
+        "terminals": [
+          {
+            "id": "L+",
+            "name": "+24V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "M",
+            "name": "0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "PE",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P2",
+            "name": "P-02 WH",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P4",
+            "name": "P-04 BK",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Arm / JB-03",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_door",
+        "type": "sensor",
+        "category": "device",
+        "tag": "FD-02",
+        "name": "FD-02 LimitSwitch",
+        "description": "Door. C-06 P-04 Black → C-10 P-04 Red → T1 I3.",
+        "x": 200,
+        "y": 500,
+        "width": 100,
+        "height": 70,
+        "terminals": [
+          {
+            "id": "1",
+            "name": "BN +V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "3",
+            "name": "BU 0V",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "4",
+            "name": "BK Door",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Door",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_belt",
+        "type": "motor",
+        "category": "device",
+        "tag": "FD-05",
+        "name": "FD-05 BeltSolenoid",
+        "description": "C-09 P-04 Black Belt FWD shared T2 Q5 / doBelt.FWD | doLamp.BeltFWD.",
+        "x": 360,
+        "y": 500,
+        "width": 110,
+        "height": 80,
+        "terminals": [
+          {
+            "id": "P1",
+            "name": "BN +",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P3",
+            "name": "BU −",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P4",
+            "name": "BK FWD",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P5",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Conveyor",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_strobe",
+        "type": "sensor",
+        "category": "device",
+        "tag": "FD-06",
+        "name": "FD-06 Strobe-01",
+        "description": "Old C-13 jacket, now C-15. Powered / warmup lamp from T1 Q0 / C-10 P-24.",
+        "x": 520,
+        "y": 500,
+        "width": 110,
+        "height": 80,
+        "terminals": [
+          {
+            "id": "P1",
+            "name": "BN lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P2",
+            "name": "WH",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P3",
+            "name": "BU lamp",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P4",
+            "name": "BK",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "P5",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Beacon",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_air",
+        "type": "sensor",
+        "category": "device",
+        "tag": "FD-03",
+        "name": "FD-03 AirRegulator",
+        "description": "C-07 M12-5 from JB-02. HOLD.",
+        "x": 680,
+        "y": 500,
+        "width": 100,
+        "height": 70,
+        "terminals": [
+          {
+            "id": "1",
+            "name": "BN",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "3",
+            "name": "BU",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "4",
+            "name": "BK",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Air",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_hitch",
+        "type": "sensor",
+        "category": "device",
+        "tag": "FD-04",
+        "name": "FD-04 HitchSolenoid",
+        "description": "C-08 M12-5 from JB-02. HOLD.",
+        "x": 820,
+        "y": 500,
+        "width": 110,
+        "height": 70,
+        "terminals": [
+          {
+            "id": "1",
+            "name": "BN",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "3",
+            "name": "BU",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "4",
+            "name": "BK",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Hitch",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      },
+      {
+        "id": "n_sw",
+        "type": "sensor",
+        "category": "device",
+        "tag": "FD-01",
+        "name": "FD-01 EthernetSwitch",
+        "description": "C-05 M12-5 52 V from JB-02. HOLD.",
+        "x": 980,
+        "y": 500,
+        "width": 120,
+        "height": 70,
+        "terminals": [
+          {
+            "id": "1",
+            "name": "BN +",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "3",
+            "name": "BU −",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "4",
+            "name": "BK",
+            "matePin": "",
+            "side": ""
+          },
+          {
+            "id": "5",
+            "name": "PE",
+            "matePin": "",
+            "side": ""
+          }
+        ],
+        "location": "Stand network",
+        "manufacturer": "",
+        "partNumber": "",
+        "mateCoding": "",
+        "matePins": 0,
+        "mateFace": "",
+        "isBulkhead": false
+      }
+    ],
+    "cables": [
+      {
+        "id": "c_c10",
+        "cableId": "C-10",
+        "templateId": "25c-homerun",
+        "name": "EtherCAT 25c homerun",
+        "type": "Control",
+        "awg": "18",
+        "length": "fly-lead",
+        "notes": "ONLY 25c homerun. eCat T1–T3 → JB-02 TB7–TB10. Mag P-06 Light Brown → TB10-5. Demag P-05 Violet → TB10-6.",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "n_cs9",
+          "terminalId": "T1I0"
+        },
+        "to": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB7-6"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BK",
+            "label": "Signal_ServoEnable_PB  diServo.Enable",
+            "pinA": "01",
+            "pinB": "01",
+            "fromTerminalId": "T1I0",
+            "toTerminalId": "TB7-6"
+          },
+          {
+            "index": 2,
+            "color": "BN",
+            "label": "Signal_ServoDisable1_PB  diServo.Disable1",
+            "pinA": "02",
+            "pinB": "02",
+            "fromTerminalId": "T1I1",
+            "toTerminalId": "TB7-7"
+          },
+          {
+            "index": 3,
+            "color": "YE",
+            "label": "Signal_ServoDisable2_PB  diServo.Disable2",
+            "pinA": "03",
+            "pinB": "03",
+            "fromTerminalId": "T1I2",
+            "toTerminalId": "TB7-8"
+          },
+          {
+            "index": 4,
+            "color": "RD",
+            "label": "Signal_Door_Switch  diServo.DoorSwitch",
+            "pinA": "04",
+            "pinB": "04",
+            "fromTerminalId": "T1I3",
+            "toTerminalId": "TB7-9"
+          },
+          {
+            "index": 5,
+            "color": "VT",
+            "label": "Demag  doGripper_EGM.DeMag  T3 Q7",
+            "pinA": "05",
+            "pinB": "05",
+            "fromTerminalId": "T3Q7",
+            "toTerminalId": "TB10-6"
+          },
+          {
+            "index": 6,
+            "color": "BN",
+            "label": "Mag  doGripper_EGM.Mag  T3 Q6  (field Light Brown)",
+            "pinA": "06",
+            "pinB": "06",
+            "fromTerminalId": "T3Q6",
+            "toTerminalId": "TB10-5"
+          },
+          {
+            "index": 7,
+            "color": "BU",
+            "label": "Lamp_ServoEnable  doLamp.ServoEnabled",
+            "pinA": "07",
+            "pinB": "07",
+            "fromTerminalId": "T1Q1",
+            "toTerminalId": "TB8-2"
+          },
+          {
+            "index": 8,
+            "color": "GY",
+            "label": "Lamp_ServoDisable1  doLamp.ServoDisabled1",
+            "pinA": "08",
+            "pinB": "08",
+            "fromTerminalId": "T1Q2",
+            "toTerminalId": "TB8-3"
+          },
+          {
+            "index": 9,
+            "color": "PK",
+            "label": "Lamp_ServoDisable2  doLamp.ServoDisabled2",
+            "pinA": "09",
+            "pinB": "09",
+            "fromTerminalId": "T1Q3",
+            "toTerminalId": "TB8-4"
+          },
+          {
+            "index": 10,
+            "color": "GN",
+            "label": "Signal_Abort/Stow  diTskSelect.Abort",
+            "pinA": "10",
+            "pinB": "10",
+            "fromTerminalId": "T2I2",
+            "toTerminalId": "TB8-5"
+          },
+          {
+            "index": 11,
+            "color": "WH",
+            "label": "Signal_Cycle  diTskSelect.TPS_Cycle",
+            "pinA": "11",
+            "pinB": "11",
+            "fromTerminalId": "T2I3",
+            "toTerminalId": "TB8-6"
+          },
+          {
+            "index": 12,
+            "color": "OG",
+            "label": "Signal_Speed  diOption.Speed",
+            "pinA": "12",
+            "pinB": "12",
+            "fromTerminalId": "T2I4",
+            "toTerminalId": "TB8-7"
+          },
+          {
+            "index": 13,
+            "color": "RD",
+            "label": "Signal_Belt-FWD_PB  diOption.Belt_FWD  (Red/Black)",
+            "pinA": "13",
+            "pinB": "13",
+            "fromTerminalId": "T2I5",
+            "toTerminalId": "TB8-8"
+          },
+          {
+            "index": 14,
+            "color": "GN",
+            "label": "Signal_Belt-REV_PB  diOption.Belt_REV  (Red/Green)",
+            "pinA": "14",
+            "pinB": "14",
+            "fromTerminalId": "T2I6",
+            "toTerminalId": "TB8-9"
+          },
+          {
+            "index": 15,
+            "color": "YE",
+            "label": "Signal_ClearPose_PB  diTskSelect.ClearPose  (Red/Yellow)",
+            "pinA": "15",
+            "pinB": "15",
+            "fromTerminalId": "T2I7",
+            "toTerminalId": "TB8-10"
+          },
+          {
+            "index": 16,
+            "color": "BN",
+            "label": "Lamp_ServoDisabled  doLamp.ServoDisabled  (White/Brown)",
+            "pinA": "16",
+            "pinB": "16",
+            "fromTerminalId": "T2Q1",
+            "toTerminalId": "TB9-1"
+          },
+          {
+            "index": 17,
+            "color": "VT",
+            "label": "Lamp_Abort  doLamp.Abort  (White/Purple)",
+            "pinA": "17",
+            "pinB": "17",
+            "fromTerminalId": "T2Q2",
+            "toTerminalId": "TB9-2"
+          },
+          {
+            "index": 18,
+            "color": "RD",
+            "label": "Lamp_Cycle  doLamp.Cycle  (White/Red)",
+            "pinA": "18",
+            "pinB": "18",
+            "fromTerminalId": "T2Q3",
+            "toTerminalId": "TB9-3"
+          },
+          {
+            "index": 19,
+            "color": "BK",
+            "label": "Lamp_Speed  doLamp.SlowSpeed  (White/Black)",
+            "pinA": "19",
+            "pinB": "19",
+            "fromTerminalId": "T2Q4",
+            "toTerminalId": "TB9-4"
+          },
+          {
+            "index": 20,
+            "color": "BU",
+            "label": "Lamp_Belt-FWD  doLamp.BeltFWD | doBelt.FWD SHARED  (White/Blue)",
+            "pinA": "20",
+            "pinB": "20",
+            "fromTerminalId": "T2Q5",
+            "toTerminalId": "TB9-5"
+          },
+          {
+            "index": 21,
+            "color": "GN",
+            "label": "Lamp_Belt-REV  doBelt.REV  (White.Green)",
+            "pinA": "21",
+            "pinB": "21",
+            "fromTerminalId": "T2Q6",
+            "toTerminalId": "TB9-6"
+          },
+          {
+            "index": 22,
+            "color": "YE",
+            "label": "Lamp_ClearPose  doLamp.ClearPose  (White/Yellow)",
+            "pinA": "22",
+            "pinB": "22",
+            "fromTerminalId": "T2Q7",
+            "toTerminalId": "TB9-7"
+          },
+          {
+            "index": 23,
+            "color": "OG",
+            "label": "Signal_Gripper-Lock  diOption.Gripper_Lock  (White/Orange)",
+            "pinA": "23",
+            "pinB": "23",
+            "fromTerminalId": "T3I0",
+            "toTerminalId": "TB9-8"
+          },
+          {
+            "index": 24,
+            "color": "GY",
+            "label": "Lamp_isPowered / Warmup  T1 Q0 SHARED  (White.Grey)",
+            "pinA": "24",
+            "pinB": "24",
+            "fromTerminalId": "T1Q0",
+            "toTerminalId": "TB8-1"
+          },
+          {
+            "index": 25,
+            "color": "BK",
+            "label": "Lamp_GripperLocked  doLamp.GripperLocked  (White/Red/Black)",
+            "pinA": "25",
+            "pinB": "25",
+            "fromTerminalId": "T3Q4",
+            "toTerminalId": "TB10-3"
+          }
+        ],
+        "route": {
+          "midX": 220,
+          "midY": 40
+        }
+      },
+      {
+        "id": "c_c11",
+        "cableId": "C-11",
+        "templateId": "r23-19",
+        "name": "R23-19 arm feed",
+        "type": "Control",
+        "awg": "20",
+        "length": "through-arm",
+        "notes": "NOT a second 25c. JB-02 → JB-03 forearm through TX2. Mag doubled P-09 + P-13 from TB10-5. Demag doubled P-08 + P-14 from TB10-6.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "R23",
+          "gender": "male",
+          "pins": 19,
+          "label": "R23-19"
+        },
+        "endB": {
+          "kind": "R23",
+          "gender": "male",
+          "pins": 19,
+          "label": "R23-19"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB10-5"
+        },
+        "to": {
+          "nodeId": "n_jb03",
+          "terminalId": "R23-09"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "VT",
+            "label": "HOLD / spare",
+            "pinA": "01",
+            "pinB": "01",
+            "fromTerminalId": "PARK-01",
+            "toTerminalId": "R23-01"
+          },
+          {
+            "index": 2,
+            "color": "RD",
+            "label": "HOLD / spare",
+            "pinA": "02",
+            "pinB": "02",
+            "fromTerminalId": "PARK-02",
+            "toTerminalId": "R23-02"
+          },
+          {
+            "index": 3,
+            "color": "GY",
+            "label": "HOLD / spare",
+            "pinA": "03",
+            "pinB": "03",
+            "fromTerminalId": "PARK-03",
+            "toTerminalId": "R23-03"
+          },
+          {
+            "index": 4,
+            "color": "BU",
+            "label": "HOLD / spare  (Red/Blu)",
+            "pinA": "04",
+            "pinB": "04",
+            "fromTerminalId": "PARK-04",
+            "toTerminalId": "R23-04"
+          },
+          {
+            "index": 5,
+            "color": "GN",
+            "label": "HOLD / spare",
+            "pinA": "05",
+            "pinB": "05",
+            "fromTerminalId": "PARK-05",
+            "toTerminalId": "R23-05"
+          },
+          {
+            "index": 6,
+            "color": "BU",
+            "label": "HOLD / spare",
+            "pinA": "06",
+            "pinB": "06",
+            "fromTerminalId": "PARK-06",
+            "toTerminalId": "R23-06"
+          },
+          {
+            "index": 7,
+            "color": "PK",
+            "label": "HOLD / spare  (Gry/Pnk)",
+            "pinA": "07",
+            "pinB": "07",
+            "fromTerminalId": "PARK-07",
+            "toTerminalId": "R23-07"
+          },
+          {
+            "index": 8,
+            "color": "GN",
+            "label": "Demag  doubled from TB10-6 / C-10 P-05  (Wht/Grn)",
+            "pinA": "08",
+            "pinB": "08",
+            "fromTerminalId": "TB10-6",
+            "toTerminalId": "R23-08"
+          },
+          {
+            "index": 9,
+            "color": "YE",
+            "label": "Mag  doubled from TB10-5 / C-10 P-06  (Wht/Yel)",
+            "pinA": "09",
+            "pinB": "09",
+            "fromTerminalId": "TB10-5",
+            "toTerminalId": "R23-09"
+          },
+          {
+            "index": 10,
+            "color": "GY",
+            "label": "HOLD / spare  (Wht/Gry)",
+            "pinA": "10",
+            "pinB": "10",
+            "fromTerminalId": "PARK-10",
+            "toTerminalId": "R23-10"
+          },
+          {
+            "index": 11,
+            "color": "BK",
+            "label": "HOLD / spare",
+            "pinA": "11",
+            "pinB": "11",
+            "fromTerminalId": "PARK-11",
+            "toTerminalId": "R23-11"
+          },
+          {
+            "index": 12,
+            "color": "GNYE",
+            "label": "EMH power − / GND",
+            "pinA": "12",
+            "pinB": "12",
+            "fromTerminalId": "PARK-12",
+            "toTerminalId": "R23-12"
+          },
+          {
+            "index": 13,
+            "color": "BN",
+            "label": "Mag  doubled from TB10-5 / C-10 P-06  (Yel/Brw)",
+            "pinA": "13",
+            "pinB": "13",
+            "fromTerminalId": "TB10-5",
+            "toTerminalId": "R23-13"
+          },
+          {
+            "index": 14,
+            "color": "GN",
+            "label": "Demag  doubled from TB10-6 / C-10 P-05  (Brw/Grn)",
+            "pinA": "14",
+            "pinB": "14",
+            "fromTerminalId": "TB10-6",
+            "toTerminalId": "R23-14"
+          },
+          {
+            "index": 15,
+            "color": "WH",
+            "label": "HOLD — old book Mag",
+            "pinA": "15",
+            "pinB": "15",
+            "fromTerminalId": "PARK-15",
+            "toTerminalId": "R23-15"
+          },
+          {
+            "index": 16,
+            "color": "YE",
+            "label": "HOLD — old book Demag",
+            "pinA": "16",
+            "pinB": "16",
+            "fromTerminalId": "PARK-16",
+            "toTerminalId": "R23-16"
+          },
+          {
+            "index": 17,
+            "color": "PK",
+            "label": "HOLD / spare",
+            "pinA": "17",
+            "pinB": "17",
+            "fromTerminalId": "PARK-17",
+            "toTerminalId": "R23-17"
+          },
+          {
+            "index": 18,
+            "color": "BN",
+            "label": "HOLD / spare  (Gry/Brw)",
+            "pinA": "18",
+            "pinB": "18",
+            "fromTerminalId": "PARK-18",
+            "toTerminalId": "R23-18"
+          },
+          {
+            "index": 19,
+            "color": "BN",
+            "label": "EMH power +",
+            "pinA": "19",
+            "pinB": "19",
+            "fromTerminalId": "PARK-19",
+            "toTerminalId": "R23-19"
+          }
+        ],
+        "route": {
+          "midX": 540,
+          "midY": 40
+        }
+      },
+      {
+        "id": "c_c12",
+        "cableId": "C-12",
+        "templateId": "term-m12-8f-8m",
+        "name": "M12-8 J4 → EMH84 logic",
+        "type": "Signal",
+        "awg": "24",
+        "length": "0.5 m",
+        "notes": "Field-true: P-01 White = Mag, P-02 Brown = Demag. Status pins 4–8 open / no C-10 home.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 8,
+          "label": "M12-8F"
+        },
+        "endB": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 8,
+          "label": "M12-8F"
+        },
+        "from": {
+          "nodeId": "n_j4_8",
+          "terminalId": "F1"
+        },
+        "to": {
+          "nodeId": "n_emh",
+          "terminalId": "MAG"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "WH",
+            "label": "Mag  doGripper_EGM.Mag  T3 Q6 / C-10 P-06",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "F1",
+            "toTerminalId": "MAG"
+          },
+          {
+            "index": 2,
+            "color": "BN",
+            "label": "Demag  doGripper_EGM.DeMag  T3 Q7 / C-10 P-05",
+            "pinA": "2",
+            "pinB": "2",
+            "fromTerminalId": "F2",
+            "toTerminalId": "DEMAG"
+          },
+          {
+            "index": 3,
+            "color": "GN",
+            "label": "EMH 0V / GND",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "F3",
+            "toTerminalId": "GND"
+          },
+          {
+            "index": 4,
+            "color": "YE",
+            "label": "open — was part-detect",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "F4",
+            "toTerminalId": "YE"
+          },
+          {
+            "index": 5,
+            "color": "GY",
+            "label": "open — was alarm",
+            "pinA": "5",
+            "pinB": "5",
+            "fromTerminalId": "F5",
+            "toTerminalId": "GY"
+          },
+          {
+            "index": 6,
+            "color": "PK",
+            "label": "open — was MagON status",
+            "pinA": "6",
+            "pinB": "6",
+            "fromTerminalId": "F6",
+            "toTerminalId": "PK"
+          },
+          {
+            "index": 7,
+            "color": "BU",
+            "label": "open — was Force A",
+            "pinA": "7",
+            "pinB": "7",
+            "fromTerminalId": "F7",
+            "toTerminalId": "BU"
+          },
+          {
+            "index": 8,
+            "color": "RD",
+            "label": "open — was Force B",
+            "pinA": "8",
+            "pinB": "8",
+            "fromTerminalId": "F8",
+            "toTerminalId": "RD"
+          }
+        ],
+        "route": {
+          "midX": 1080,
+          "midY": 40
+        }
+      },
+      {
+        "id": "c_c13",
+        "cableId": "C-13",
+        "templateId": "term-m12-4f-4m",
+        "name": "M12-4 J4 → EMH84 power",
+        "type": "Power",
+        "awg": "22",
+        "length": "0.5 m",
+        "notes": "P-01 Brown +24, P-02 White 0V, P-03 Blue 0V, P-04 Black +24. Buzz polarity.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 4,
+          "label": "M12-4F"
+        },
+        "endB": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 4,
+          "label": "M12-4F"
+        },
+        "from": {
+          "nodeId": "n_j4_4",
+          "terminalId": "F1"
+        },
+        "to": {
+          "nodeId": "n_emh",
+          "terminalId": "P1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "EMH +24",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "F1",
+            "toTerminalId": "P1"
+          },
+          {
+            "index": 2,
+            "color": "WH",
+            "label": "EMH 0V",
+            "pinA": "2",
+            "pinB": "2",
+            "fromTerminalId": "F2",
+            "toTerminalId": "P2"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "EMH 0V",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "F3",
+            "toTerminalId": "P2"
+          },
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "EMH +24",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "F4",
+            "toTerminalId": "P1"
+          }
+        ],
+        "route": {
+          "midX": 1080,
+          "midY": 200
+        }
+      },
+      {
+        "id": "c_c14",
+        "cableId": "C-14",
+        "templateId": "term-m12-5f-5m",
+        "name": "M12-5 HMI (was C-12)",
+        "type": "Power",
+        "awg": "22",
+        "length": "",
+        "notes": "Renumbered. PBS-03 → JB-03-HMI-02. HOLD — confirm still present.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "from": {
+          "nodeId": "n_pbs03",
+          "terminalId": "TB5-3"
+        },
+        "to": {
+          "nodeId": "n_hmi",
+          "terminalId": "L+"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "HMI +24",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB5-3",
+            "toTerminalId": "L+"
+          },
+          {
+            "index": 2,
+            "color": "WH",
+            "label": "(blank)",
+            "pinA": "2",
+            "pinB": "2",
+            "fromTerminalId": "NO1",
+            "toTerminalId": "P2"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "HMI 0V",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "TB6-X2",
+            "toTerminalId": "M"
+          },
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "(blank)",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "NC1",
+            "toTerminalId": "P4"
+          },
+          {
+            "index": 5,
+            "color": "GNYE",
+            "label": "PE / spare",
+            "pinA": "5",
+            "pinB": "5",
+            "fromTerminalId": "PE",
+            "toTerminalId": "PE"
+          }
+        ],
+        "route": {
+          "midX": 700,
+          "midY": 320
+        }
+      },
+      {
+        "id": "c_c15",
+        "cableId": "C-15",
+        "templateId": "term-m12-5f-5m",
+        "name": "M12-5 strobe (was C-13)",
+        "type": "Control",
+        "awg": "22",
+        "length": "",
+        "notes": "Renumbered. PBS-04 → FD-06. P-01/P-03 Arm-IsPowered from T1 Q0 / C-10 P-24. HOLD — confirm still present.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "from": {
+          "nodeId": "n_pbs04",
+          "terminalId": "TB10-1"
+        },
+        "to": {
+          "nodeId": "n_strobe",
+          "terminalId": "P1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "Lamp_Arm-IsPowered",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB10-1",
+            "toTerminalId": "P1"
+          },
+          {
+            "index": 2,
+            "color": "WH",
+            "label": "(blank)",
+            "pinA": "2",
+            "pinB": "2",
+            "fromTerminalId": "NO1",
+            "toTerminalId": "P2"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "Lamp_Arm-IsPowered",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "TB10-X2",
+            "toTerminalId": "P3"
+          },
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "(blank)",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "NC1",
+            "toTerminalId": "P4"
+          },
+          {
+            "index": 5,
+            "color": "GNYE",
+            "label": "PE / spare",
+            "pinA": "5",
+            "pinB": "5",
+            "fromTerminalId": "PE",
+            "toTerminalId": "P5"
+          }
+        ],
+        "route": {
+          "midX": 620,
+          "midY": 460
+        }
+      },
+      {
+        "id": "c_c01",
+        "cableId": "C-01",
+        "templateId": "term-m12-12f-leads",
+        "name": "M12-12 Maintenance",
+        "type": "Control",
+        "awg": "24",
+        "length": "",
+        "notes": "JB-02 → PBS-01. HOLD detail pins.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 12,
+          "label": "M12-12F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB3-1"
+        },
+        "to": {
+          "nodeId": "n_pbs01",
+          "terminalId": "NO1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "WH",
+            "label": "C-01 bundle",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB3-1",
+            "toTerminalId": "NO1"
+          }
+        ],
+        "route": {
+          "midX": 280,
+          "midY": 240
+        }
+      },
+      {
+        "id": "c_c02",
+        "cableId": "C-02",
+        "templateId": "term-m12-12f-leads",
+        "name": "M12-12 Operation",
+        "type": "Control",
+        "awg": "24",
+        "length": "",
+        "notes": "JB-02 → PBS-02. HOLD detail pins.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 12,
+          "label": "M12-12F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB3-2"
+        },
+        "to": {
+          "nodeId": "n_pbs02",
+          "terminalId": "NO1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "WH",
+            "label": "C-02 bundle",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB3-2",
+            "toTerminalId": "NO1"
+          }
+        ],
+        "route": {
+          "midX": 360,
+          "midY": 240
+        }
+      },
+      {
+        "id": "c_c03",
+        "cableId": "C-03",
+        "templateId": "term-m12-8f-leads",
+        "name": "M12-8 Servo-01",
+        "type": "Control",
+        "awg": "24",
+        "length": "",
+        "notes": "JB-02 → PBS-03.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 8,
+          "label": "M12-8F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB3-5"
+        },
+        "to": {
+          "nodeId": "n_pbs03",
+          "terminalId": "TB5-3"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "WH",
+            "label": "+24",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB3-5",
+            "toTerminalId": "TB5-3"
+          },
+          {
+            "index": 2,
+            "color": "BN",
+            "label": "Enable lamp",
+            "pinA": "2",
+            "pinB": "2",
+            "fromTerminalId": "TB3-6",
+            "toTerminalId": "TB5-X1"
+          },
+          {
+            "index": 3,
+            "color": "GN",
+            "label": "Disable1 lamp",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "TB3-7",
+            "toTerminalId": "TB6-X1"
+          },
+          {
+            "index": 4,
+            "color": "YE",
+            "label": "(blank)",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "TB3-8",
+            "toTerminalId": "NO1"
+          },
+          {
+            "index": 5,
+            "color": "GY",
+            "label": "0V",
+            "pinA": "5",
+            "pinB": "5",
+            "fromTerminalId": "TB3-9",
+            "toTerminalId": "TB6-X2"
+          },
+          {
+            "index": 6,
+            "color": "PK",
+            "label": "Enable PB",
+            "pinA": "6",
+            "pinB": "6",
+            "fromTerminalId": "TB3-10",
+            "toTerminalId": "TB5-4"
+          },
+          {
+            "index": 7,
+            "color": "BU",
+            "label": "Disable1 PB",
+            "pinA": "7",
+            "pinB": "7",
+            "fromTerminalId": "TB4-1",
+            "toTerminalId": "TB6-2"
+          },
+          {
+            "index": 8,
+            "color": "RD",
+            "label": "(blank)",
+            "pinA": "8",
+            "pinB": "8",
+            "fromTerminalId": "TB4-2",
+            "toTerminalId": "NC1"
+          }
+        ],
+        "route": {
+          "midX": 460,
+          "midY": 240
+        }
+      },
+      {
+        "id": "c_c04",
+        "cableId": "C-04",
+        "templateId": "term-m12-8f-leads",
+        "name": "M12-8 Servo-02",
+        "type": "Control",
+        "awg": "24",
+        "length": "",
+        "notes": "JB-02 → PBS-04.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 8,
+          "label": "M12-8F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB4-3"
+        },
+        "to": {
+          "nodeId": "n_pbs04",
+          "terminalId": "TB10-1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "WH",
+            "label": "+24",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB4-3",
+            "toTerminalId": "TB10-1"
+          },
+          {
+            "index": 2,
+            "color": "BN",
+            "label": "Enable lamp",
+            "pinA": "2",
+            "pinB": "2",
+            "fromTerminalId": "TB4-4",
+            "toTerminalId": "TB10-X1"
+          },
+          {
+            "index": 3,
+            "color": "GN",
+            "label": "Disable2 lamp",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "TB4-5",
+            "toTerminalId": "TB11-X1"
+          },
+          {
+            "index": 4,
+            "color": "YE",
+            "label": "(blank)",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "TB4-6",
+            "toTerminalId": "NO1"
+          },
+          {
+            "index": 5,
+            "color": "GY",
+            "label": "0V",
+            "pinA": "5",
+            "pinB": "5",
+            "fromTerminalId": "TB4-7",
+            "toTerminalId": "TB10-X2"
+          },
+          {
+            "index": 6,
+            "color": "PK",
+            "label": "Enable PB",
+            "pinA": "6",
+            "pinB": "6",
+            "fromTerminalId": "TB4-8",
+            "toTerminalId": "TB10-2"
+          },
+          {
+            "index": 7,
+            "color": "BU",
+            "label": "Disable2 PB",
+            "pinA": "7",
+            "pinB": "7",
+            "fromTerminalId": "TB4-9",
+            "toTerminalId": "TB11-2"
+          },
+          {
+            "index": 8,
+            "color": "RD",
+            "label": "(blank)",
+            "pinA": "8",
+            "pinB": "8",
+            "fromTerminalId": "TB4-10",
+            "toTerminalId": "NC1"
+          }
+        ],
+        "route": {
+          "midX": 540,
+          "midY": 240
+        }
+      },
+      {
+        "id": "c_c05",
+        "cableId": "C-05",
+        "templateId": "term-m12-5f-leads",
+        "name": "M12-5 52V switch",
+        "type": "Power",
+        "awg": "22",
+        "length": "",
+        "notes": "JB-02 → FD-01. HOLD.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB5-1"
+        },
+        "to": {
+          "nodeId": "n_sw",
+          "terminalId": "1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "+52V",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB5-1",
+            "toTerminalId": "1"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "0V",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "TB5-3",
+            "toTerminalId": "3"
+          }
+        ],
+        "route": {
+          "midX": 720,
+          "midY": 300
+        }
+      },
+      {
+        "id": "c_c06",
+        "cableId": "C-06",
+        "templateId": "term-m12-5f-leads",
+        "name": "M12-5 door",
+        "type": "Sensor",
+        "awg": "22",
+        "length": "",
+        "notes": "JB-02 TB5-9 → FD-02 P-04 Black. Continues on C-10 P-04.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB5-9"
+        },
+        "to": {
+          "nodeId": "n_door",
+          "terminalId": "4"
+        },
+        "conductors": [
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "Door",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "TB5-9",
+            "toTerminalId": "4"
+          }
+        ],
+        "route": {
+          "midX": 240,
+          "midY": 440
+        }
+      },
+      {
+        "id": "c_c07",
+        "cableId": "C-07",
+        "templateId": "term-m12-5f-leads",
+        "name": "M12-5 air",
+        "type": "Sensor",
+        "awg": "22",
+        "length": "",
+        "notes": "JB-02 → FD-03. HOLD.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB6-1"
+        },
+        "to": {
+          "nodeId": "n_air",
+          "terminalId": "4"
+        },
+        "conductors": [
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "air",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "TB6-1",
+            "toTerminalId": "4"
+          }
+        ],
+        "route": {
+          "midX": 560,
+          "midY": 440
+        }
+      },
+      {
+        "id": "c_c08",
+        "cableId": "C-08",
+        "templateId": "term-m12-5f-leads",
+        "name": "M12-5 hitch",
+        "type": "Sensor",
+        "awg": "22",
+        "length": "",
+        "notes": "JB-02 → FD-04. HOLD.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB6-3"
+        },
+        "to": {
+          "nodeId": "n_hitch",
+          "terminalId": "4"
+        },
+        "conductors": [
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "hitch",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "TB6-3",
+            "toTerminalId": "4"
+          }
+        ],
+        "route": {
+          "midX": 640,
+          "midY": 440
+        }
+      },
+      {
+        "id": "c_c09",
+        "cableId": "C-09",
+        "templateId": "term-m12-5f-leads",
+        "name": "M12-5 belt solenoid",
+        "type": "Control",
+        "awg": "22",
+        "length": "",
+        "notes": "JB-02 TB7-4 → FD-05 P-04. Shared T2 Q5.",
+        "partNumber": "",
+        "terminated": true,
+        "endA": {
+          "kind": "M12-A",
+          "gender": "female",
+          "pins": 5,
+          "label": "M12-5F"
+        },
+        "endB": {
+          "kind": "flying-leads",
+          "gender": null,
+          "pins": null,
+          "label": "Flying leads"
+        },
+        "from": {
+          "nodeId": "n_jb02",
+          "terminalId": "TB7-4"
+        },
+        "to": {
+          "nodeId": "n_belt",
+          "terminalId": "P4"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "+",
+            "pinA": "1",
+            "pinB": "1",
+            "fromTerminalId": "TB7-1",
+            "toTerminalId": "P1"
+          },
+          {
+            "index": 3,
+            "color": "BU",
+            "label": "−",
+            "pinA": "3",
+            "pinB": "3",
+            "fromTerminalId": "TB7-3",
+            "toTerminalId": "P3"
+          },
+          {
+            "index": 4,
+            "color": "BK",
+            "label": "Belt FWD shared",
+            "pinA": "4",
+            "pinB": "4",
+            "fromTerminalId": "TB7-4",
+            "toTerminalId": "P4"
+          },
+          {
+            "index": 5,
+            "color": "GNYE",
+            "label": "PE",
+            "pinA": "5",
+            "pinB": "5",
+            "fromTerminalId": "TB7-5",
+            "toTerminalId": "P5"
+          }
+        ],
+        "route": {
+          "midX": 400,
+          "midY": 440
+        }
+      },
+      {
+        "id": "c_jmp_mag",
+        "cableId": "JMP-MAG",
+        "templateId": "2c-control",
+        "name": "Forearm Mag jumper",
+        "type": "Control",
+        "awg": "18",
+        "length": "0.2 m",
+        "notes": "JB-03 R23-09 + R23-13 → J4 M12-8 panel P1 (White Mag).",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "n_jb03",
+          "terminalId": "R23-09"
+        },
+        "to": {
+          "nodeId": "n_j4_8",
+          "terminalId": "P1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "YE",
+            "label": "Mag from R23-09",
+            "pinA": "09",
+            "pinB": "P1",
+            "fromTerminalId": "R23-09",
+            "toTerminalId": "P1"
+          },
+          {
+            "index": 2,
+            "color": "BN",
+            "label": "Mag from R23-13",
+            "pinA": "13",
+            "pinB": "P1",
+            "fromTerminalId": "R23-13",
+            "toTerminalId": "P1"
+          }
+        ],
+        "route": {
+          "midX": 860,
+          "midY": 40
+        }
+      },
+      {
+        "id": "c_jmp_dem",
+        "cableId": "JMP-DEM",
+        "templateId": "2c-control",
+        "name": "Forearm Demag jumper",
+        "type": "Control",
+        "awg": "18",
+        "length": "0.2 m",
+        "notes": "JB-03 R23-08 + R23-14 → J4 M12-8 panel P2 (Brown Demag).",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "n_jb03",
+          "terminalId": "R23-08"
+        },
+        "to": {
+          "nodeId": "n_j4_8",
+          "terminalId": "P2"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "GN",
+            "label": "Demag from R23-08",
+            "pinA": "08",
+            "pinB": "P2",
+            "fromTerminalId": "R23-08",
+            "toTerminalId": "P2"
+          },
+          {
+            "index": 2,
+            "color": "GN",
+            "label": "Demag from R23-14",
+            "pinA": "14",
+            "pinB": "P2",
+            "fromTerminalId": "R23-14",
+            "toTerminalId": "P2"
+          }
+        ],
+        "route": {
+          "midX": 860,
+          "midY": 90
+        }
+      },
+      {
+        "id": "c_jmp_p",
+        "cableId": "JMP-24",
+        "templateId": "2c-control",
+        "name": "Forearm EMH +24 jumper",
+        "type": "Power",
+        "awg": "18",
+        "length": "0.2 m",
+        "notes": "R23-19 +24 → J4 M12-4 panel P1/P4.",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "n_jb03",
+          "terminalId": "R23-19"
+        },
+        "to": {
+          "nodeId": "n_j4_4",
+          "terminalId": "P1"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "BN",
+            "label": "+24",
+            "pinA": "19",
+            "pinB": "1",
+            "fromTerminalId": "R23-19",
+            "toTerminalId": "P1"
+          }
+        ],
+        "route": {
+          "midX": 860,
+          "midY": 180
+        }
+      },
+      {
+        "id": "c_jmp_0v",
+        "cableId": "JMP-0V",
+        "templateId": "2c-control",
+        "name": "Forearm EMH 0V jumper",
+        "type": "Power",
+        "awg": "18",
+        "length": "0.2 m",
+        "notes": "R23-12 0V → J4 M12-4 panel P2 and M12-8 P3.",
+        "partNumber": "",
+        "terminated": false,
+        "endA": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "endB": {
+          "kind": "open",
+          "gender": null,
+          "pins": null,
+          "label": "Open / bulk"
+        },
+        "from": {
+          "nodeId": "n_jb03",
+          "terminalId": "R23-12"
+        },
+        "to": {
+          "nodeId": "n_j4_4",
+          "terminalId": "P2"
+        },
+        "conductors": [
+          {
+            "index": 1,
+            "color": "GNYE",
+            "label": "0V to M12-4",
+            "pinA": "12",
+            "pinB": "2",
+            "fromTerminalId": "R23-12",
+            "toTerminalId": "P2"
+          }
+        ],
+        "route": {
+          "midX": 860,
+          "midY": 220
+        }
+      }
+    ],
+    "view": {
+      "x": 16.922362429992592,
+      "y": 326.8681393476599,
+      "scale": 0.32543004673062675
+    },
+    "meta": {
+      "drawingNumber": "WD-RAIV-T3-001",
+      "revision": "C",
+      "drawnBy": "electrical recovery",
+      "notes": "RAIV-T3 electrical recovery. Controller F-24-0064095-C-002. App PlateSorter. C-10 is the only 25c homerun. C-11 is R23-19 arm feed (not a second 25c). C-12 M12-8 EMH logic: P-01 White Mag, P-02 Brown Demag. C-13 M12-4 EMH power. C-14 HMI and C-15 strobe are the old C-12/C-13 jackets renumbered. T3 Q0–Q3 carry T2 safety-stop names (doSafteyStop.None/Waiting/SS1/SS2) with no C-10 home. Mag path: C-10 P-06 → TB10-5 → C-11 P-09+P-13 → C-12 P-01 White. Demag path: C-10 P-05 → TB10-6 → C-11 P-08+P-14 → C-12 P-02 Brown."
+    }
   }
 }
