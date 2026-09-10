@@ -1,7 +1,7 @@
 {
   "type": "raiv-wire-projects-library",
   "version": 1,
-  "savedAt": "2026-09-08T10:31:21.068Z",
+  "savedAt": "2026-09-10T20:00:16.392Z",
   "activeId": "proj_mtsj3rlm_3",
   "projects": {
     "proj_mrz5jajb_2": {
@@ -1220,7 +1220,7 @@
       "id": "proj_mtsj3rlm_3",
       "name": "Demo Build",
       "createdAt": "2026-09-08T10:11:28.000Z",
-      "updatedAt": "2026-09-08T10:31:21.051Z",
+      "updatedAt": "2026-09-10T20:00:16.390Z",
       "nodes": [
         {
           "id": "n_cs9",
@@ -1229,8 +1229,8 @@
           "tag": "CS9",
           "name": "CS9 F-24-0064095-C-002",
           "description": "PlateSorter autoStart. EtherCAT J206 3-slice D24403. T3 Q0–Q3 = T2 safety-stop names (no C-10 home).",
-          "x": 40,
-          "y": 60,
+          "x": -55,
+          "y": -76,
           "width": 200,
           "height": 220,
           "terminals": [
@@ -3388,8 +3388,8 @@
             }
           ],
           "route": {
-            "midX": 220,
-            "midY": 40
+            "midX": -92,
+            "midY": -142
           }
         },
         {
@@ -4744,9 +4744,9 @@
         }
       ],
       "view": {
-        "x": 16.922362429992592,
-        "y": 326.8681393476599,
-        "scale": 0.32543004673062675
+        "x": 99.60235448005233,
+        "y": 144.08637517143598,
+        "scale": 0.6775670372792675
       },
       "meta": {
         "drawingNumber": "WD-RAIV-T3-001",
